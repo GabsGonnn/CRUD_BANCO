@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "77462472066",
+    "firebase_url": "https://automacao-5d8e0-default-rtdb.firebaseio.com",
+    "project_id": "automacao-5d8e0",
+    "storage_bucket": "automacao-5d8e0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:77462472066:android:6574a79ea33d7301c63b9b",
+        "android_client_info": {
+          "package_name": "com.example.aula01"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPjNJiJA1tRT0LRwhai2zSLAQbmHF6nsc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:77462472066:android:ba539034781aa091c63b9b",
+        "android_client_info": {
+          "package_name": "com.example.crud_banco"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPjNJiJA1tRT0LRwhai2zSLAQbmHF6nsc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
