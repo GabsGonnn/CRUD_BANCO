@@ -1,4 +1,4 @@
-package com.example.crud_banco
+package com.example.crud_banco.models
 
 import java.time.LocalDate
 

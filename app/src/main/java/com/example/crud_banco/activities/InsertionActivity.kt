@@ -1,10 +1,12 @@
-package com.example.crud_banco
+package com.example.crud_banco.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import com.example.crud_banco.R
+import com.example.crud_banco.models.DispositivosModelo
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import java.time.LocalDate
