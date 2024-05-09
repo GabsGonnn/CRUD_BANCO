@@ -6,23 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".activities.DispositivosDetailsActivity">
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnUpdate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="Update"
+        android:background="@drawable/button_background"
         app:layout_constraintEnd_toStartOf="@+id/btnDelete"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/linearLayout" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnDelete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="Delete"
+        android:background="@drawable/button_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btnUpdate"
@@ -55,7 +57,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
-                android:background="@color/purple">
+                android:background="@color/yellow">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -108,7 +110,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
-                android:background="@color/purple">
+                android:background="@color/yellow">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -160,7 +162,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
-                android:background="@color/purple">
+                android:background="@color/yellow">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -216,7 +218,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
-                android:background="@color/purple">
+                android:background="@color/yellow">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -274,7 +276,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
-                android:background="@color/purple">
+                android:background="@color/yellow">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -333,7 +335,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
-                android:background="@color/purple">
+                android:background="@color/yellow">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -391,7 +393,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
-                android:background="@color/purple">
+                android:background="@color/yellow">
 
                 <TextView
                     android:layout_width="match_parent"
