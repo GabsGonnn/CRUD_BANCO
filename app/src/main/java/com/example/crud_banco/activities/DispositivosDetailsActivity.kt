@@ -1,16 +1,19 @@
 package com.example.crud_banco.activities
-
+import org.json.JSONObject
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SwitchCompat
 import com.example.crud_banco.R
 import com.example.crud_banco.models.DispositivosModelo
 import com.google.firebase.database.FirebaseDatabase
+import MQTTManager
 
 class DispositivosDetailsActivity : AppCompatActivity() {
     private lateinit var tvDispId: TextView
@@ -20,15 +23,19 @@ class DispositivosDetailsActivity : AppCompatActivity() {
     private lateinit var tvDispLocal: TextView
     private lateinit var tvDispDtInst: TextView
     private lateinit var tvDispDtAtt: TextView
-
     private lateinit var btnUpdate: Button
     private lateinit var btnDelete: Button
+    private lateinit var switchPower: SwitchCompat
+    private lateinit var mqttManager: MQTTManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dispositivos_details)
         initView()
         setValuesToViews()
+        //mqttManager = MQTTManager()
+        //mqttManager.connect()
+
 
         btnUpdate.setOnClickListener{
             openUpdateDialog(
@@ -47,6 +54,8 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
     }
 
+
+
     private fun initView() {
         tvDispId = findViewById(R.id.tvDispId)
         tvDispName = findViewById(R.id.tvDispName)
@@ -58,6 +67,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
         btnUpdate = findViewById(R.id.btnUpdate)
         btnDelete = findViewById(R.id.btnDelete)
+        switchPower = findViewById(R.id.switchPower)
     }
 
     private fun setValuesToViews() {
@@ -157,5 +167,16 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         }
     }
 
+    /*fun onSwitchClick(view: View) {
+        val message = JSONObject()
+        if (switchPower.isChecked) {
+            message.put("led_Control", "1")
+        } else {
+            message.put("led_Control", "0")
+        }
+
+        mqttManager.publish(message.toString())
+    }
+    */
 }
 

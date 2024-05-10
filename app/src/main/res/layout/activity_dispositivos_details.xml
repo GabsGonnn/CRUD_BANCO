@@ -30,14 +30,33 @@
         app:layout_constraintStart_toEndOf="@+id/btnUpdate"
         app:layout_constraintTop_toBottomOf="@id/linearLayout" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="0.396"
+        app:showText="true"
+        app:thumbTint="@color/seletor_thumb"
+        app:trackTint="@color/selector_track"
+        android:onClick="onSwitchClick"
+        android:id="@+id/switchPower"
+        android:thumb="@drawable/thumb"
+        app:track="@drawable/track"/>
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        android:orientation="vertical">
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
 
         <LinearLayout
@@ -47,8 +66,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
-            android:orientation="horizontal"
             android:background="@color/material_dynamic_neutral70"
+            android:orientation="horizontal"
             android:weightSum="2"
 
             >
@@ -72,9 +91,9 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:background="@drawable/border_background"
                 android:layout_height="match_parent"
-                android:layout_weight="1.4">
+                android:layout_weight="1.4"
+                android:background="@drawable/border_background">
 
                 <TextView
 
@@ -102,8 +121,8 @@
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:orientation="horizontal"
             android:background="@color/material_dynamic_neutral70"
+            android:orientation="horizontal"
             android:weightSum="2">
 
             <LinearLayout
@@ -126,8 +145,8 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/border_background"
-                android:layout_weight="1.4">
+                android:layout_weight="1.4"
+                android:background="@drawable/border_background">
 
                 <TextView
                     android:id="@+id/tvDispName"
@@ -149,10 +168,10 @@
         <LinearLayout
 
             android:layout_width="match_parent"
-            android:background="@color/material_dynamic_neutral70"
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:background="@color/material_dynamic_neutral70"
             android:orientation="horizontal"
             android:weightSum="2"
 
@@ -181,8 +200,8 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/border_background"
-                android:layout_weight="1.4">
+                android:layout_weight="1.4"
+                android:background="@drawable/border_background">
 
                 <TextView
                     android:id="@+id/tvDispTipo"
@@ -208,8 +227,8 @@
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:orientation="horizontal"
             android:background="@color/material_dynamic_neutral70"
+            android:orientation="horizontal"
             android:weightSum="2"
 
             >
@@ -234,14 +253,13 @@
                     />
 
 
-
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:background="@drawable/border_background"
                 android:layout_height="match_parent"
-                android:layout_weight="1.4">
+                android:layout_weight="1.4"
+                android:background="@drawable/border_background">
 
                 <TextView
                     android:id="@+id/tvDispStatus"
@@ -266,8 +284,8 @@
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:orientation="horizontal"
             android:background="@color/material_dynamic_neutral70"
+            android:orientation="horizontal"
             android:weightSum="2"
 
             >
@@ -292,14 +310,13 @@
                     />
 
 
-
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/border_background"
-                android:layout_weight="1.4">
+                android:layout_weight="1.4"
+                android:background="@drawable/border_background">
 
 
                 <TextView
@@ -325,8 +342,8 @@
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:orientation="horizontal"
             android:background="@color/material_dynamic_neutral70"
+            android:orientation="horizontal"
             android:weightSum="2"
 
             >
@@ -351,14 +368,13 @@
                     />
 
 
-
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/border_background"
-                android:layout_weight="1.4">
+                android:layout_weight="1.4"
+                android:background="@drawable/border_background">
 
                 <TextView
                     android:id="@+id/tvDispDtInst"
@@ -383,8 +399,8 @@
             android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:orientation="horizontal"
             android:background="@color/material_dynamic_neutral70"
+            android:orientation="horizontal"
             android:weightSum="2"
 
             >
@@ -409,14 +425,13 @@
                     />
 
 
-
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/border_background"
-                android:layout_weight="1.4">
+                android:layout_weight="1.4"
+                android:background="@drawable/border_background">
 
                 <TextView
                     android:id="@+id/tvDispDtAtt"
@@ -435,8 +450,7 @@
 
         </LinearLayout>
 
-
-
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

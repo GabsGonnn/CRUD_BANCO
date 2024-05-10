@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Cor para o estado "false" -->
+    <item android:color="@color/cor_thumb_false" android:state_checked="false" />
+    <!-- Cor para o estado "true" -->
+    <item android:color="@color/cor_thumb_false" android:state_checked="true" />
+
+</selector>
