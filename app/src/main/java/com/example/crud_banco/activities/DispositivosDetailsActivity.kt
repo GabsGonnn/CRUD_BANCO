@@ -26,18 +26,16 @@ class DispositivosDetailsActivity : AppCompatActivity() {
     private lateinit var btnUpdate: Button
     private lateinit var btnDelete: Button
     private lateinit var switchPower: SwitchCompat
-    private lateinit var mqttManager: MQTTManager
+    //private lateinit var mqttManager: MQTTManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dispositivos_details)
         initView()
         setValuesToViews()
-        //mqttManager = MQTTManager()
-        //mqttManager.connect()
+        //mqttManager = MQTTManager(this)
 
-
-        btnUpdate.setOnClickListener{
+        btnUpdate.setOnClickListener {
             openUpdateDialog(
                 intent.getStringExtra("dispId").toString(),
                 intent.getStringExtra("dispNome").toString()
@@ -53,8 +51,6 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
 
     }
-
-
 
     private fun initView() {
         tvDispId = findViewById(R.id.tvDispId)
@@ -84,7 +80,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
     private fun openUpdateDialog(
         dispId: String,
         dispNome: String
-    ){
+    ) {
         val mDialog = AlertDialog.Builder(this)
         val inflater = layoutInflater
         val mDialogView = inflater.inflate(R.layout.update_dialog, null)
@@ -122,7 +118,8 @@ class DispositivosDetailsActivity : AppCompatActivity() {
                 etDispDtAtt.text.toString(),
             )
 
-            Toast.makeText(applicationContext, "Dispositivos Data Updated", Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Dispositivos Data Updated", Toast.LENGTH_LONG)
+                .show()
 
             //we are setting updated data to our textviews
             tvDispName.text = etDispNome.text.toString()
@@ -144,7 +141,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         local: String,
         dtInst: String,
         dtAtt: String
-    ){
+    ) {
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp").child(id)
         val dispInfo = DispositivosModelo(id, nome, tipo, status, local, dtInst, dtAtt)
         dbRef.setValue(dispInfo)
@@ -152,7 +149,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
     private fun deleteRecord(
         id: String
-    ){
+    ) {
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp").child(id)
         val mTask = dbRef.removeValue()
 
@@ -162,12 +159,14 @@ class DispositivosDetailsActivity : AppCompatActivity() {
             val intent = Intent(this, FetchingActivity::class.java)
             finish()
             startActivity(intent)
-        }.addOnFailureListener{ error ->
+        }.addOnFailureListener { error ->
             Toast.makeText(this, "Deleting Err ${error.message}", Toast.LENGTH_LONG).show()
         }
+
     }
 
-    /*fun onSwitchClick(view: View) {
+
+    fun onSwitchClick(view: View) {
         val message = JSONObject()
         if (switchPower.isChecked) {
             message.put("led_Control", "1")
@@ -175,8 +174,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
             message.put("led_Control", "0")
         }
 
-        mqttManager.publish(message.toString())
+        val topic = "esp32/sub"
+        //mqttManager.publish(topic, message.toString())
     }
-    */
 }
-
