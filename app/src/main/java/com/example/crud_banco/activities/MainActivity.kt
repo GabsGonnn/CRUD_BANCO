@@ -1,5 +1,6 @@
 package com.example.crud_banco.activities
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.graphics.Color
@@ -9,8 +10,13 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fab: FloatingActionButton
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var bottomNavigationView: BottomNavigationView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +72,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         fab.setOnClickListener {
-            showBottomDialog()
+
+         showBottomDialog()
         }
     }
 
@@ -77,38 +85,73 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showBottomDialog() {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(com.example.crud_banco.R.layout.bottomsheetlayout)
+        val items = arrayOf("Item 1", "Item 2", "Item 3", "Item 4")
 
-        val videoLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutVideo)
-        val shortsLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutShorts)
-        val liveLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutLive)
-        val cancelButton = dialog.findViewById<ImageView>(com.example.crud_banco.R.id.cancelButton)
+        val mDialog = androidx.appcompat.app.AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        val mDialogView = inflater.inflate(R.layout.insertion_dialog, null)
 
-        videoLayout.setOnClickListener {
-            dialog.dismiss()
-            Toast.makeText(this, "Upload a Video is clicked", Toast.LENGTH_SHORT).show()
-        }
+        mDialog.setView(mDialogView)
+        val etDispNome = mDialogView.findViewById<EditText>(R.id.etDispNome)
+        val etDispLocal = mDialogView.findViewById<EditText>(R.id.etDispLocal)
+        val etDispDtInst = mDialogView.findViewById<EditText>(R.id.etDispDtInst)
+        val btnUpdateData = mDialogView.findViewById<Button>(R.id.btnUpdateData)
 
-        shortsLayout.setOnClickListener {
-            dialog.dismiss()
-            Toast.makeText(this, "Create a short is Clicked", Toast.LENGTH_SHORT).show()
-        }
+        val spinner = Spinner(this)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
 
-        liveLayout.setOnClickListener {
-            dialog.dismiss()
-            Toast.makeText(this, "Go live is Clicked", Toast.LENGTH_SHORT).show()
-        }
+        val alertDialog = mDialog.create()
+        alertDialog.show()
 
-        cancelButton.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.attributes?.windowAnimations = com.example.crud_banco.R.style.DialogAnimation
-        dialog.window?.setGravity(Gravity.BOTTOM)
+        AlertDialog.Builder(this)
+            .setTitle("Escolha um item")
+            .setView(spinner)
+            .setPositiveButton("OK") { dialog, _ ->
+                val selectedItem = items[spinner.selectedItemPosition]
+                // Faça algo com o item selecionado
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancelar") { dialog, _ ->
+                dialog.cancel()
+            }
+            .show()
     }
 }
+
+//        val dialog = Dialog(this)
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+//        dialog.setContentView(com.example.crud_banco.R.layout.bottomsheetlayout)
+//
+//        val videoLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutVideo)
+//        val shortsLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutShorts)
+//        val liveLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutLive)
+//        val cancelButton = dialog.findViewById<ImageView>(com.example.crud_banco.R.id.cancelButton)
+//
+//        videoLayout.setOnClickListener {
+//            dialog.dismiss()
+//            Toast.makeText(this, "Upload a Video is clicked", Toast.LENGTH_SHORT).show()
+//        }
+//
+//        shortsLayout.setOnClickListener {
+//            dialog.dismiss()
+//            Toast.makeText(this, "Create a short is Clicked", Toast.LENGTH_SHORT).show()
+//        }
+//
+//        liveLayout.setOnClickListener {
+//            dialog.dismiss()
+//            Toast.makeText(this, "Go live is Clicked", Toast.LENGTH_SHORT).show()
+//        }
+//
+//        cancelButton.setOnClickListener {
+//            dialog.dismiss()
+//        }
+//
+//        dialog.show()
+//        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+//        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//        dialog.window?.attributes?.windowAnimations = com.example.crud_banco.R.style.DialogAnimation
+//        dialog.window?.setGravity(Gravity.BOTTOM)
+//    }
+

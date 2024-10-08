@@ -138,14 +138,6 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
         val btnUpdateData = mDialogView.findViewById<Button>(R.id.btnUpdateData)
 
-        /*
-        etDispNome.setText(intent.getStringExtra("dispNome").toString())
-        etDispTipo.setText(intent.getStringExtra("dispTipo").toString())
-        etDispStatus.setText(intent.getStringExtra("dispStatus").toString())
-        etDispLocal.setText(intent.getStringExtra("dispLocal").toString())
-        etDispDtInst.setText(intent.getStringExtra("dispDtInst").toString())
-        etDispDtAtt.setText(intent.getStringExtra("dispDtAtt").toString())*/
-
         etDispNome.setText(tvDispName.text.toString())
         etDispTipo.setText(tvDispTipo.text.toString())
         etDispStatus.setText(tvDispStatus.text.toString())
