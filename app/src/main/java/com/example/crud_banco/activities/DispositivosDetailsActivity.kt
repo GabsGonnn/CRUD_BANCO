@@ -1,19 +1,17 @@
 package com.example.crud_banco.activities
-import org.json.JSONObject
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
+import com.example.crud_banco.HomeFragment
 import com.example.crud_banco.R
 import com.example.crud_banco.models.DispositivosModelo
 import com.google.firebase.database.FirebaseDatabase
-import MQTTManager
 
 class DispositivosDetailsActivity : AppCompatActivity() {
     private lateinit var tvDispId: TextView
@@ -33,9 +31,11 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_dispositivos_details)
         initView()
         setValuesToViews()
-        //mqttManager = MQTTManager(this)
+        //mqttManager = MQTTManager()
+        //mqttManager.connect()
 
-        btnUpdate.setOnClickListener {
+
+        btnUpdate.setOnClickListener{
             openUpdateDialog(
                 intent.getStringExtra("dispId").toString(),
                 intent.getStringExtra("dispNome").toString()
@@ -51,6 +51,8 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
 
     }
+
+
 
     private fun initView() {
         tvDispId = findViewById(R.id.tvDispId)
@@ -80,7 +82,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
     private fun openUpdateDialog(
         dispId: String,
         dispNome: String
-    ) {
+    ){
         val mDialog = AlertDialog.Builder(this)
         val inflater = layoutInflater
         val mDialogView = inflater.inflate(R.layout.update_dialog, null)
@@ -118,8 +120,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
                 etDispDtAtt.text.toString(),
             )
 
-            Toast.makeText(applicationContext, "Dispositivos Data Updated", Toast.LENGTH_LONG)
-                .show()
+            Toast.makeText(applicationContext, "Dispositivos Data Updated", Toast.LENGTH_LONG).show()
 
             //we are setting updated data to our textviews
             tvDispName.text = etDispNome.text.toString()
@@ -141,7 +142,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         local: String,
         dtInst: String,
         dtAtt: String
-    ) {
+    ){
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp").child(id)
         val dispInfo = DispositivosModelo(id, nome, tipo, status, local, dtInst, dtAtt)
         dbRef.setValue(dispInfo)
@@ -149,24 +150,22 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
     private fun deleteRecord(
         id: String
-    ) {
+    ){
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp").child(id)
         val mTask = dbRef.removeValue()
 
         mTask.addOnSuccessListener {
             Toast.makeText(this, "Dispositivo data deleted", Toast.LENGTH_LONG).show()
 
-            val intent = Intent(this, FetchingActivity::class.java)
+            val intent = Intent(this, HomeFragment::class.java)
             finish()
             startActivity(intent)
-        }.addOnFailureListener { error ->
+        }.addOnFailureListener{ error ->
             Toast.makeText(this, "Deleting Err ${error.message}", Toast.LENGTH_LONG).show()
         }
-
     }
 
-
-    fun onSwitchClick(view: View) {
+    /*fun onSwitchClick(view: View) {
         val message = JSONObject()
         if (switchPower.isChecked) {
             message.put("led_Control", "1")
@@ -174,7 +173,8 @@ class DispositivosDetailsActivity : AppCompatActivity() {
             message.put("led_Control", "0")
         }
 
-        val topic = "esp32/sub"
-        //mqttManager.publish(topic, message.toString())
+        mqttManager.publish(message.toString())
     }
+    */
 }
+

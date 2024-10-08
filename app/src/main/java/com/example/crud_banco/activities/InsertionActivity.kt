@@ -24,7 +24,7 @@ class InsertionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_insertion)
+        setContentView(R.layout.fragment_insertion)
 
         etDispNome = findViewById(R.id.etDispNome)
         etDispTipo = findViewById(R.id.etDispTipo)
@@ -35,51 +35,46 @@ class InsertionActivity : AppCompatActivity() {
         dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp")
 
         btnSalvar.setOnClickListener{
-            saveDispositivos()
-        }
-    }
-
-    private fun saveDispositivos(){
-        val dispNome = etDispNome.text.toString()
-        val dispTipo = etDispTipo.text.toString()
-        val dispStatus = "desligado"
-        val dispLocal = etDispLocal.text.toString()
-        val dispDtInst = etDisptDtInst.text.toString()
-        val dispDtAtt = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-        } else {
-            TODO("VERSION.SDK_INT < O")
-        }
-
-        if (dispNome.isEmpty()){
-            etDispNome.error ="Insira o nome do dispositivo pfv :)"
-        }
-        if (dispTipo.isEmpty()){
-            etDispTipo.error ="Insira o tipo do dispositivo pfv :)"
-        }
-        if (dispLocal.isEmpty()){
-            etDispLocal.error ="Insira o local do dispositivo pfv :)"
-        }
-        if (dispDtInst.isEmpty()){
-            etDisptDtInst.error ="Insira a data de instalação do dispositivo pfv :)"
-        }
-
-        val dispId = dbRef.push().key?: ""
-
-        val dispositivosss = DispositivosModelo(dispId,dispNome,dispTipo,dispStatus,dispLocal,dispDtInst,dispDtAtt)
-
-        dbRef.child(dispId).setValue(dispositivosss)
-            .addOnCompleteListener{
-                Toast.makeText(this,"Dado inserido com sucesso",Toast.LENGTH_SHORT).show()
-
-                etDispNome.text.clear()
-                etDispTipo.text.clear()
-                etDisptDtInst.text.clear()
-                etDispLocal.text.clear()
-
-            }.addOnFailureListener{ err->
-                Toast.makeText(this,"Erro ${err.message}",Toast.LENGTH_SHORT).show()
+            val dispNome = etDispNome.text.toString()
+            val dispTipo = etDispTipo.text.toString()
+            val dispStatus = "desligado"
+            val dispLocal = etDispLocal.text.toString()
+            val dispDtInst = etDisptDtInst.text.toString()
+            val dispDtAtt = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+            } else {
+                TODO("VERSION.SDK_INT < O")
             }
-    }
 
-}
+            if (dispNome.isEmpty()){
+                etDispNome.error ="Insira o nome do dispositivo pfv :)"
+            }
+            if (dispTipo.isEmpty()){
+                etDispTipo.error ="Insira o tipo do dispositivo pfv :)"
+            }
+            if (dispLocal.isEmpty()){
+                etDispLocal.error ="Insira o local do dispositivo pfv :)"
+            }
+            if (dispDtInst.isEmpty()){
+                etDisptDtInst.error ="Insira a data de instalação do dispositivo pfv :)"
+            }
+
+            val dispId = dbRef.push().key?: ""
+
+            val dispositivosss = DispositivosModelo(dispId,dispNome,dispTipo,dispStatus,dispLocal,dispDtInst,dispDtAtt)
+
+            dbRef.child(dispId).setValue(dispositivosss)
+                .addOnCompleteListener{
+                    Toast.makeText(this,"Dado inserido com sucesso",Toast.LENGTH_SHORT).show()
+
+                    etDispNome.text.clear()
+                    etDispTipo.text.clear()
+                    etDisptDtInst.text.clear()
+                    etDispLocal.text.clear()
+
+                }.addOnFailureListener{ err->
+                    Toast.makeText(this,"Erro ${err.message}",Toast.LENGTH_SHORT).show()
+                }
+        }
+        }
+    }

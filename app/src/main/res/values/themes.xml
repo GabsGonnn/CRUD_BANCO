@@ -11,4 +11,13 @@
 
 
     <style name="Theme.CRUD_BANCO" parent="Base.Theme.CRUD_BANCO" />
+
+
+    <style name="DialogAnimation">
+
+        <item name="android:windowEnterAnimation">@anim/slide_in </item>
+        <item name="android:windowExitAnimation">@anim/slide_out </item>
+
+    </style>
+
 </resources>

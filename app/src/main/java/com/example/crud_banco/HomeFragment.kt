@@ -1,13 +1,15 @@
-package com.example.crud_banco.activities
+package com.example.crud_banco
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.crud_banco.R
+import com.example.crud_banco.activities.DispositivosDetailsActivity
 import com.example.crud_banco.adapters.DispAdapter
 import com.example.crud_banco.models.DispositivosModelo
 import com.google.firebase.database.DataSnapshot
@@ -16,30 +18,34 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class FetchingActivity : AppCompatActivity() {
+class HomeFragment : Fragment() {
 
     private lateinit var dispRecyclerView: RecyclerView
     private lateinit var tvLoadingData: TextView
     private lateinit var dispList: ArrayList<DispositivosModelo>
     private lateinit var dbRef: DatabaseReference
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_home)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Infle o layout para este fragmento
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        dispRecyclerView = findViewById(R.id.rvDisp)
-        dispRecyclerView.layoutManager = LinearLayoutManager(this)
+        // Inicialize as views
+        dispRecyclerView = view.findViewById(R.id.rvDisp)
+        dispRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         dispRecyclerView.setHasFixedSize(true)
-        tvLoadingData = findViewById(R.id.tvLoadingData)
+        tvLoadingData = view.findViewById(R.id.tvLoadingData)
 
-        dispList = arrayListOf<DispositivosModelo>()
+        dispList = arrayListOf()
 
         getEmployeesData()
 
+        return view
     }
 
     private fun getEmployeesData() {
-
         dispRecyclerView.visibility = View.GONE
         tvLoadingData.visibility = View.VISIBLE
 
@@ -48,20 +54,19 @@ class FetchingActivity : AppCompatActivity() {
         dbRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 dispList.clear()
-                if (snapshot.exists()){
-                    for (empSnap in snapshot.children){
+                if (snapshot.exists()) {
+                    for (empSnap in snapshot.children) {
                         val empData = empSnap.getValue(DispositivosModelo::class.java)
-                        dispList.add(empData!!)
+                        empData?.let { dispList.add(it) }
                     }
                     val mAdapter = DispAdapter(dispList)
                     dispRecyclerView.adapter = mAdapter
 
-                    mAdapter.setOnItemClickListener(object : DispAdapter.onItemClickListener{
+                    mAdapter.setOnItemClickListener(object : DispAdapter.onItemClickListener {
                         override fun onItemClick(position: Int) {
+                            val intent = Intent(requireContext(), DispositivosDetailsActivity::class.java)
 
-                            val intent = Intent(this@FetchingActivity, DispositivosDetailsActivity::class.java)
-
-                            //put extras
+                            // Coloque extras
                             intent.putExtra("dispId", dispList[position].dispId)
                             intent.putExtra("dispNome", dispList[position].dispNome)
                             intent.putExtra("dispTipo", dispList[position].dispTipo)
@@ -71,7 +76,6 @@ class FetchingActivity : AppCompatActivity() {
                             intent.putExtra("dispDtAtt", dispList[position].dispDtAtt)
                             startActivity(intent)
                         }
-
                     })
 
                     dispRecyclerView.visibility = View.VISIBLE
@@ -80,9 +84,8 @@ class FetchingActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                // Tratar erro se necessário
             }
-
         })
     }
 }

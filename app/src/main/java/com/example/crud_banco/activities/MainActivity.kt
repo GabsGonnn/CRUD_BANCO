@@ -1,31 +1,114 @@
 package com.example.crud_banco.activities
 
-import android.content.Intent
+import android.app.Dialog
+import android.content.DialogInterface
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.widget.Button
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import com.example.crud_banco.HomeFragment
+import com.example.crud_banco.InsertionFragment
 import com.example.crud_banco.R
-
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
 
-
+    private lateinit var fab: FloatingActionButton
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(com.example.crud_banco.R.layout.activity_main)
 
-        var btnInsert = findViewById<Button>(R.id.btnInsert)
+        bottomNavigationView = findViewById(com.example.crud_banco.R.id.bottomNavigationView)
+        fab = findViewById(com.example.crud_banco.R.id.fab)
+        drawerLayout = findViewById(com.example.crud_banco.R.id.drawer_layout)
+        val navigationView: NavigationView = findViewById(com.example.crud_banco.R.id.nav_view)
+        val toolbar: Toolbar = findViewById(com.example.crud_banco.R.id.toolbar)
 
-        var btnFetch = findViewById<Button>(R.id.btnFetch)
+        setSupportActionBar(toolbar)
+        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar,
+            com.example.crud_banco.R.string.open_nav, com.example.crud_banco.R.string.close_nav)
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
 
-        btnInsert.setOnClickListener{
-            val intent = Intent(this, InsertionActivity::class.java)
-            startActivity(intent)
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(com.example.crud_banco.R.id.frame_layout, HomeFragment())
+                .commit()
+            navigationView.setCheckedItem(com.example.crud_banco.R.id.nav_home)
         }
-        btnFetch.setOnClickListener{
-            val intent = Intent(this, FetchingActivity::class.java)
-            startActivity(intent)
+
+        replaceFragment(HomeFragment())
+
+        bottomNavigationView.setBackground(null)
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                com.example.crud_banco.R.id.home -> replaceFragment(HomeFragment())
+                com.example.crud_banco.R.id.shorts -> replaceFragment(InsertionFragment())
+            }
+            true
         }
+
+        fab.setOnClickListener {
+            showBottomDialog()
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(com.example.crud_banco.R.id.frame_layout, fragment)
+        fragmentTransaction.commit()
+    }
+
+    private fun showBottomDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(com.example.crud_banco.R.layout.bottomsheetlayout)
+
+        val videoLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutVideo)
+        val shortsLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutShorts)
+        val liveLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutLive)
+        val cancelButton = dialog.findViewById<ImageView>(com.example.crud_banco.R.id.cancelButton)
+
+        videoLayout.setOnClickListener {
+            dialog.dismiss()
+            Toast.makeText(this, "Upload a Video is clicked", Toast.LENGTH_SHORT).show()
+        }
+
+        shortsLayout.setOnClickListener {
+            dialog.dismiss()
+            Toast.makeText(this, "Create a short is Clicked", Toast.LENGTH_SHORT).show()
+        }
+
+        liveLayout.setOnClickListener {
+            dialog.dismiss()
+            Toast.makeText(this, "Go live is Clicked", Toast.LENGTH_SHORT).show()
+        }
+
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.attributes?.windowAnimations = com.example.crud_banco.R.style.DialogAnimation
+        dialog.window?.setGravity(Gravity.BOTTOM)
     }
 }

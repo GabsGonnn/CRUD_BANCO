@@ -42,6 +42,10 @@
             android:name=".activities.MainActivity"
             android:exported="true" >
 
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+
         </activity>
 
         <service android:name= "org.eclipse.paho.android.service.MqttService"/>
