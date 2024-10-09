@@ -33,6 +33,9 @@
             android:name=".activities.DispositivosDetailsActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.LogDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.FetchingActivity"
             android:exported="false" />
         <activity

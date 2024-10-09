@@ -17,7 +17,7 @@
         android:title=""/>
 
     <item
-        android:id="@+id/Incrições"
+        android:id="@+id/Incricoes"
         android:title="Subscriptions"
         android:icon="@drawable/baseline_subscriptions_24" />
     <item

@@ -36,7 +36,7 @@ tools:context=".activities.MainActivity">
             android:id="@+id/tvLoadingData"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Loading Data....."
+            android:text="Carregando....."
             android:textSize="28sp"
             android:textColor="@color/black"
             android:textStyle="bold"
@@ -52,49 +52,3 @@ tools:context=".activities.MainActivity">
     </FrameLayout>
 
 </FrameLayout>
-<!--<androidx.constraintlayout.widget.ConstraintLayout-->
-<!--android:layout_width="match_parent"-->
-<!--android:layout_height="match_parent">-->
-
-<!--<androidx.appcompat.widget.AppCompatButton-->
-<!--    android:id="@+id/btnInsert"-->
-<!--    android:layout_width="130dp"-->
-<!--    android:layout_height="64dp"-->
-<!--    android:layout_marginBottom="244dp"-->
-<!--    android:background="@drawable/button_background"-->
-<!--    android:text="Novo"-->
-<!--    app:layout_constraintBottom_toBottomOf="parent"-->
-<!--    app:layout_constraintEnd_toEndOf="parent"-->
-<!--    app:layout_constraintHorizontal_bias="0.498"-->
-<!--    app:layout_constraintStart_toStartOf="parent"-->
-<!--    app:layout_constraintTop_toBottomOf="@+id/textView"-->
-<!--    app:layout_constraintVertical_bias="0.217" />-->
-
-<!--<androidx.appcompat.widget.AppCompatButton-->
-<!--    android:id="@+id/btnFetch"-->
-<!--    android:layout_width="130dp"-->
-<!--    android:layout_height="64dp"-->
-<!--    android:layout_marginBottom="244dp"-->
-<!--    android:background="@drawable/button_background"-->
-<!--    android:text="Dispositivos"-->
-<!--    app:layout_constraintBottom_toBottomOf="parent"-->
-<!--    app:layout_constraintEnd_toEndOf="parent"-->
-<!--    app:layout_constraintHorizontal_bias="0.498"-->
-<!--    app:layout_constraintStart_toStartOf="parent"-->
-<!--    app:layout_constraintTop_toBottomOf="@+id/textView"-->
-<!--    app:layout_constraintVertical_bias="0.802" />-->
-
-<!--<TextView-->
-<!--    android:id="@+id/textView"-->
-<!--    android:layout_width="212dp"-->
-<!--    android:layout_height="112dp"-->
-<!--    android:layout_gravity="center"-->
-<!--    android:text="Banco Automação"-->
-<!--    android:textAlignment="center"-->
-<!--    android:textSize="36sp"-->
-<!--    app:layout_constraintBottom_toBottomOf="parent"-->
-<!--    app:layout_constraintLeft_toLeftOf="parent"-->
-<!--    app:layout_constraintRight_toRightOf="parent"-->
-<!--    app:layout_constraintTop_toTopOf="parent"-->
-<!--    app:layout_constraintVertical_bias="0.105" />-->
-<!--</androidx.constraintlayout.widget.ConstraintLayout>-->

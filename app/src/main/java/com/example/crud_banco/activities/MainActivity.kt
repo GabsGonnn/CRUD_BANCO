@@ -1,21 +1,18 @@
 package com.example.crud_banco.activities
 
 import android.app.AlertDialog
-import android.app.Dialog
-import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Gravity
+import android.provider.Settings
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -23,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.example.crud_banco.HistoricoFragment
 import com.example.crud_banco.HomeFragment
 import com.example.crud_banco.InsertionFragment
 import com.example.crud_banco.R
@@ -36,7 +34,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var bottomNavigationView: BottomNavigationView
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(com.example.crud_banco.R.layout.activity_main)
@@ -48,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(com.example.crud_banco.R.id.toolbar)
 
         setSupportActionBar(toolbar)
+
         val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar,
             com.example.crud_banco.R.string.open_nav, com.example.crud_banco.R.string.close_nav)
         drawerLayout.addDrawerListener(toggle)
@@ -60,20 +58,35 @@ class MainActivity : AppCompatActivity() {
             navigationView.setCheckedItem(com.example.crud_banco.R.id.nav_home)
         }
 
-        replaceFragment(HomeFragment())
-
         bottomNavigationView.setBackground(null)
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 com.example.crud_banco.R.id.home -> replaceFragment(HomeFragment())
                 com.example.crud_banco.R.id.shorts -> replaceFragment(InsertionFragment())
+                com.example.crud_banco.R.id.Incricoes -> replaceFragment(HistoricoFragment())
+                com.example.crud_banco.R.id.Biblioteca -> replaceFragment(HistoricoFragment())
             }
             true
         }
 
         fab.setOnClickListener {
+            showBottomDialog()
+        }
+    }
 
-         showBottomDialog()
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.nav_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.nav_settings -> {
+                Toast.makeText(this, "Configurações clicadas", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -85,73 +98,40 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showBottomDialog() {
-        val items = arrayOf("Item 1", "Item 2", "Item 3", "Item 4")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Adicionar Item")
 
-        val mDialog = androidx.appcompat.app.AlertDialog.Builder(this)
-        val inflater = layoutInflater
-        val mDialogView = inflater.inflate(R.layout.insertion_dialog, null)
+        // Inflate o layout do diálogo
+        val dialogView = layoutInflater.inflate(R.layout.insertion_dialog, null)
+        builder.setView(dialogView)
 
-        mDialog.setView(mDialogView)
-        val etDispNome = mDialogView.findViewById<EditText>(R.id.etDispNome)
-        val etDispLocal = mDialogView.findViewById<EditText>(R.id.etDispLocal)
-        val etDispDtInst = mDialogView.findViewById<EditText>(R.id.etDispDtInst)
-        val btnUpdateData = mDialogView.findViewById<Button>(R.id.btnUpdateData)
+        // Referências aos campos do diálogo
+        val editTextName = dialogView.findViewById<EditText>(R.id.etDispNome)
+        val spinnerType = dialogView.findViewById<Spinner>(R.id.spinnerType)
+        val editTextLocation = dialogView.findViewById<EditText>(R.id.etDispLocal)
+        val editTextDate = dialogView.findViewById<EditText>(R.id.etDispDtInst)
 
-        val spinner = Spinner(this)
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+        // Configurar o Spinner
+        val types = arrayOf("lâmpada", "ventilador", "sensor")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
+        spinnerType.adapter = adapter
 
-        val alertDialog = mDialog.create()
-        alertDialog.show()
+        // Configurar os botões do diálogo
+        builder.setPositiveButton("Adicionar") { dialog, which ->
+            val name = editTextName.text.toString()
+            val type = spinnerType.selectedItem.toString()
+            val location = editTextLocation.text.toString()
+            val date = editTextDate.text.toString()
 
-        AlertDialog.Builder(this)
-            .setTitle("Escolha um item")
-            .setView(spinner)
-            .setPositiveButton("OK") { dialog, _ ->
-                val selectedItem = items[spinner.selectedItemPosition]
-                // Faça algo com o item selecionado
-                dialog.dismiss()
-            }
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.cancel()
-            }
-            .show()
+            // Aqui você pode fazer o que quiser com os dados (ex: salvar em uma lista)
+            // Exemplo: Toast.makeText(this, "Item Adicionado: $name", Toast.LENGTH_SHORT).show()
+        }
+
+        builder.setNegativeButton("Cancelar") { dialog, which ->
+            dialog.dismiss()
+        }
+
+        builder.show()
     }
 }
-
-//        val dialog = Dialog(this)
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//        dialog.setContentView(com.example.crud_banco.R.layout.bottomsheetlayout)
-//
-//        val videoLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutVideo)
-//        val shortsLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutShorts)
-//        val liveLayout = dialog.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutLive)
-//        val cancelButton = dialog.findViewById<ImageView>(com.example.crud_banco.R.id.cancelButton)
-//
-//        videoLayout.setOnClickListener {
-//            dialog.dismiss()
-//            Toast.makeText(this, "Upload a Video is clicked", Toast.LENGTH_SHORT).show()
-//        }
-//
-//        shortsLayout.setOnClickListener {
-//            dialog.dismiss()
-//            Toast.makeText(this, "Create a short is Clicked", Toast.LENGTH_SHORT).show()
-//        }
-//
-//        liveLayout.setOnClickListener {
-//            dialog.dismiss()
-//            Toast.makeText(this, "Go live is Clicked", Toast.LENGTH_SHORT).show()
-//        }
-//
-//        cancelButton.setOnClickListener {
-//            dialog.dismiss()
-//        }
-//
-//        dialog.show()
-//        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-//        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//        dialog.window?.attributes?.windowAnimations = com.example.crud_banco.R.style.DialogAnimation
-//        dialog.window?.setGravity(Gravity.BOTTOM)
-//    }
-
