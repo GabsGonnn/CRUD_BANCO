@@ -57,7 +57,12 @@ class HomeFragment : Fragment() {
                 if (snapshot.exists()) {
                     for (empSnap in snapshot.children) {
                         val empData = empSnap.getValue(DispositivosModelo::class.java)
-                        empData?.let { dispList.add(it) }
+                        empData?.let {
+                            // Filtra os dispositivos por tipo
+                            if (it.dispTipo == "lampada" || it.dispTipo == "ventilador") {
+                                dispList.add(it)
+                            }
+                        }
                     }
                     val mAdapter = DispAdapter(dispList)
                     dispRecyclerView.adapter = mAdapter

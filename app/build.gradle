@@ -8,7 +8,12 @@ android {
     namespace 'com.example.crud_banco'
     compileSdk 33
 
+    viewBinding {
+        enabled = true
+    }
+
     packagingOptions {
+        // Exclude the conflicting file
         exclude 'META-INF/io.netty.versions.properties'
         exclude 'META-INF/INDEX.LIST'
     }
@@ -41,6 +46,9 @@ android {
         dataBinding true
     }
 }
+
+
+
 
 dependencies {
 
