@@ -59,7 +59,7 @@ class SensorFragment : Fragment() {
                             // Define a imagem com base no tipo do sensor
                             val iconResId = when (it.tipoSensor) {
                                 "termometro" -> R.drawable.temp_icon
-                                "umidade" -> R.drawable.umidade_icon
+                                "higrometro" -> R.drawable.umidade_icon
                                 else -> R.drawable.temp_icon // Imagem padrão, se necessário
                             }
                             it.imagem = iconResId

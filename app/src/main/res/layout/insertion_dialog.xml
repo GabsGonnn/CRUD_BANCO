@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+
     <EditText
         android:id="@+id/etDispNome"
         android:layout_width="400dp"
@@ -26,5 +27,16 @@
         android:id="@+id/etDispDtInst"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Data de Instalação" />
+        android:hint="Data de Instalação. Ex(19/04/2024)" />
+
+    <Button
+        android:id="@+id/btnAdd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Adicionar"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="16dp"/>
+
+
+
 </LinearLayout>

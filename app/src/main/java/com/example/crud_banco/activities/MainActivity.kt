@@ -1,7 +1,10 @@
 package com.example.crud_banco.activities
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -22,6 +25,11 @@ import android.provider.Settings
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
+import android.view.Window
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentManager
@@ -29,7 +37,11 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.crud_banco.HistoricoFragment
 import com.example.crud_banco.SensorFragment
 import com.example.crud_banco.databinding.ActivityMainBinding
+import com.example.crud_banco.models.DispositivosModelo
+import com.example.crud_banco.models.Sensor
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
@@ -80,41 +92,98 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun showBottomDialog() {
-        val builder = AlertDialog.Builder(this)
+        val builder = Dialog(this)
+        // val builder = AlertDialog.Builder(this)
         builder.setTitle("Adicionar Item")
+        builder.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        builder.setContentView(com.example.crud_banco.R.layout.bottomsheetlayout)
 
-        // Inflate o layout do diálogo
-        val dialogView = layoutInflater.inflate(R.layout.insertion_dialog, null)
-        builder.setView(dialogView)
+
+        val dispDialog = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutVideo)
+        val shortsLayout = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutShorts)
+        val liveLayout = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutLive)
+        val cancelButton = builder.findViewById<ImageView>(com.example.crud_banco.R.id.cancelButton)
+
+
+        dispDialog.setOnClickListener {
+            builder.dismiss()
+            showInsertDeviceDialog()
+        }
+
+        cancelButton.setOnClickListener {
+            builder.dismiss()
+        }
+
+        builder.show()
+        builder.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        builder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        builder.window?.attributes?.windowAnimations = com.example.crud_banco.R.style.DialogAnimation
+        builder.window?.setGravity(Gravity.BOTTOM)
+    }
+    private fun showInsertDeviceDialog() {
+        val dialogBuilder = Dialog(this)
+        dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialogBuilder.setContentView(R.layout.insertion_dialog)
 
         // Referências aos campos do diálogo
-        val editTextName = dialogView.findViewById<EditText>(R.id.etDispNome)
-        val spinnerType = dialogView.findViewById<Spinner>(R.id.spinnerType)
-        val editTextLocation = dialogView.findViewById<EditText>(R.id.etDispLocal)
-        val editTextDate = dialogView.findViewById<EditText>(R.id.etDispDtInst)
+        val editTextName = dialogBuilder.findViewById<EditText>(R.id.etDispNome)
+        val spinnerType = dialogBuilder.findViewById<Spinner>(R.id.spinnerType)
+        val editTextLocation = dialogBuilder.findViewById<EditText>(R.id.etDispLocal)
+        val editTextDate = dialogBuilder.findViewById<EditText>(R.id.etDispDtInst)
 
         // Configurar o Spinner
-        val types = arrayOf("lâmpada", "ventilador", "termômetro", "higrômetro")
+        val types = arrayOf("lampada", "ventilador", "termometro", "higrometro")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerType.adapter = adapter
 
-        // Configurar os botões do diálogo
-        builder.setPositiveButton("Adicionar") { dialog, which ->
-            val name = editTextName.text.toString()
-            val type = spinnerType.selectedItem.toString()
-            val location = editTextLocation.text.toString()
+        // Configurar o botão de adicionar
+        val addButton = dialogBuilder.findViewById<Button>(R.id.btnAdd) // Supondo que você tenha um botão com esse ID
+        addButton.setOnClickListener {
+            val nome = editTextName.text.toString()
+            val tipo = spinnerType.selectedItem.toString()
+            val local = editTextLocation.text.toString()
             val date = editTextDate.text.toString()
 
-            // Aqui você pode fazer o que quiser com os dados (ex: salvar em uma lista)
-            // Exemplo: Toast.makeText(this, "Item Adicionado: $name", Toast.LENGTH_SHORT).show()
+            if (tipo == "lâmpada" || tipo == "ventilador") {
+                val dbRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Exemplo_Disp")
+                val dispId = dbRef.push().key ?: ""
+                val dispositivosss = DispositivosModelo(dispId, nome, tipo, "desligado", local, date, date)
+
+                dbRef.child(dispId).setValue(dispositivosss)
+                    .addOnCompleteListener {
+                        Toast.makeText(this, "Dado inserido com sucesso", Toast.LENGTH_SHORT).show()
+                        clearFields(editTextName, editTextLocation, editTextDate, spinnerType)
+                        dialogBuilder.dismiss()
+                    }.addOnFailureListener { err ->
+                        Toast.makeText(this, "Erro ${err.message}", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                val dbRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Exemplo_Sensores")
+                val dispId = dbRef.push().key ?: ""
+                val dispositivosss = Sensor(dispId, nome, tipo, "0", "0", date)
+
+                dbRef.child(dispId).setValue(dispositivosss)
+                    .addOnCompleteListener {
+                        Toast.makeText(this, "Dado inserido com sucesso", Toast.LENGTH_SHORT).show()
+                        clearFields(editTextName, editTextLocation, editTextDate, spinnerType)
+                        dialogBuilder.dismiss()
+                    }.addOnFailureListener { err ->
+                        Toast.makeText(this, "Erro ${err.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
         }
 
-        builder.setNegativeButton("Cancelar") { dialog, which ->
-            dialog.dismiss()
-        }
 
-        builder.show()
+        dialogBuilder.show()
+        dialogBuilder.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
+
+    private fun clearFields(editTextName: EditText, editTextLocation: EditText, editTextDate: EditText, spinnerType: Spinner) {
+        editTextName.text.clear()
+        editTextLocation.text.clear()
+        editTextDate.text.clear()
+        spinnerType.setSelection(0)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
