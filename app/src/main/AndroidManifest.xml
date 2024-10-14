@@ -18,6 +18,9 @@
         android:theme="@style/Theme.CRUD_BANCO"
         tools:targetApi="31">
         <activity
+            android:name=".activities.SensorDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.LogDetailsActivity"
             android:exported="false" />
         <activity
@@ -34,9 +37,6 @@
             android:exported="false" />
         <activity
             android:name=".activities.DispositivosDetailsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.LogDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".activities.FetchingActivity"

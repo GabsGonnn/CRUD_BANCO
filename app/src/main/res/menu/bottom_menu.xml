@@ -9,7 +9,7 @@
 
     <item
         android:id="@+id/shorts"
-        android:title="Sensosores"
+        android:title="Sensores"
         android:icon="@drawable/baseline_whatshot_24"
         />
 
@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/Incricoes"
-        android:title="Subscriptions"
+        android:title="Controle"
         android:icon="@drawable/baseline_subscriptions_24" />
     <item
         android:id="@+id/Biblioteca"

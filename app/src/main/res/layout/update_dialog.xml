@@ -64,7 +64,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:background="@drawable/button_background"
-        android:text="Update Data" />
+        android:text="Atualizar Dados" />
 
 
 </LinearLayout>

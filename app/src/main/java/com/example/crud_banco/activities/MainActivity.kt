@@ -27,6 +27,7 @@ import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.crud_banco.HistoricoFragment
+import com.example.crud_banco.SensorFragment
 import com.example.crud_banco.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
 
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 com.example.crud_banco.R.id.home -> replaceFragment(HomeFragment())
-                com.example.crud_banco.R.id.shorts -> replaceFragment(InsertionFragment())
+                com.example.crud_banco.R.id.shorts -> replaceFragment(SensorFragment())
                 //com.example.crud_banco.R.id.Incricoes -> replaceFragment(HistoricoFragment())
                 com.example.crud_banco.R.id.Biblioteca -> replaceFragment(HistoricoFragment())
             }
@@ -93,7 +94,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val editTextDate = dialogView.findViewById<EditText>(R.id.etDispDtInst)
 
         // Configurar o Spinner
-        val types = arrayOf("lâmpada", "ventilador", "sensor")
+        val types = arrayOf("lâmpada", "ventilador", "termômetro", "higrômetro")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerType.adapter = adapter
