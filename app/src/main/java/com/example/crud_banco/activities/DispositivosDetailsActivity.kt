@@ -214,7 +214,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         mTask.addOnSuccessListener {
             Toast.makeText(this, "Dispositivo data deleted", Toast.LENGTH_LONG).show()
 
-            val intent = Intent(this, FetchingActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             finish()
             startActivity(intent)
         }.addOnFailureListener { error ->
