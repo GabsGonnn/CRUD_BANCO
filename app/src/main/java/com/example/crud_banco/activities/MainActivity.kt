@@ -1,6 +1,5 @@
 package com.example.crud_banco.activities
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -12,25 +11,21 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.crud_banco.HomeFragment
-import com.example.crud_banco.InsertionFragment
 import com.example.crud_banco.R
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 import android.provider.Settings
 import android.view.Gravity
-import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.activity.OnBackPressedCallback
+import android.widget.NumberPicker
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -99,14 +94,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         val dispDialog = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutVideo)
-        val shortsLayout = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutShorts)
-        val liveLayout = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutLive)
+        val controlLuzDialog = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutShorts)
+        val controlVentDialog = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutLive)
         val cancelButton = builder.findViewById<ImageView>(com.example.crud_banco.R.id.cancelButton)
 
 
         dispDialog.setOnClickListener {
             builder.dismiss()
             showInsertDeviceDialog()
+        }
+
+        controlLuzDialog.setOnClickListener {
+            builder.dismiss()
+            showControleLuzDialog()
+        }
+
+        controlVentDialog.setOnClickListener {
+            builder.dismiss()
+            showControleVentDialog()
         }
 
         cancelButton.setOnClickListener {
@@ -120,11 +125,43 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         builder.window?.setGravity(Gravity.BOTTOM)
     }
 
+    private fun showControleVentDialog() {
+        val dialogBuilder = Dialog(this)
+        dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialogBuilder.setContentView(R.layout.insertion_controle_ventilador_dialog)
+
+        // Use dialogBuilder para encontrar os views dentro do diálogo
+        val seekBar = dialogBuilder.findViewById<SeekBar>(R.id.seekBar)
+        val seekBarValue = dialogBuilder.findViewById<TextView>(R.id.seekBarValue)
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                // Atualizar o valor exibido no TextView
+                seekBarValue.text = (progress + 1).toString() // Adiciona 1 para mostrar de 1 a 100
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        dialogBuilder.show()
+        dialogBuilder.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
+
+    private fun showControleLuzDialog() {
+        val dialogBuilder = Dialog(this)
+        dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialogBuilder.setContentView(R.layout.insertion_controle_luz_dialog)
+
+        dialogBuilder.show()
+        dialogBuilder.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
+
 
     private fun showInsertDeviceDialog() {
         val dialogBuilder = Dialog(this)
         dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialogBuilder.setContentView(R.layout.insertion_dialog)
+        dialogBuilder.setContentView(R.layout.insertion_dispositivo_dialog)
 
 
         val editTextName = dialogBuilder.findViewById<EditText>(R.id.etDispNome)
@@ -133,7 +170,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val editTextDate = dialogBuilder.findViewById<EditText>(R.id.etDispDtInst)
 
 
-        val types = arrayOf("lampada", "ventilador", "termometro", "higrometro")
+        val types = arrayOf("Selecione um tipo","lampada", "ventilador", "termometro", "higrometro")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerType.adapter = adapter
