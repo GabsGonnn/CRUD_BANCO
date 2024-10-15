@@ -93,7 +93,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun showBottomDialog() {
         val builder = Dialog(this)
-        // val builder = AlertDialog.Builder(this)
         builder.setTitle("Adicionar Item")
         builder.requestWindowFeature(Window.FEATURE_NO_TITLE)
         builder.setContentView(com.example.crud_banco.R.layout.bottomsheetlayout)
@@ -120,25 +119,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         builder.window?.attributes?.windowAnimations = com.example.crud_banco.R.style.DialogAnimation
         builder.window?.setGravity(Gravity.BOTTOM)
     }
+
+
     private fun showInsertDeviceDialog() {
         val dialogBuilder = Dialog(this)
         dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogBuilder.setContentView(R.layout.insertion_dialog)
 
-        // Referências aos campos do diálogo
+
         val editTextName = dialogBuilder.findViewById<EditText>(R.id.etDispNome)
         val spinnerType = dialogBuilder.findViewById<Spinner>(R.id.spinnerType)
         val editTextLocation = dialogBuilder.findViewById<EditText>(R.id.etDispLocal)
         val editTextDate = dialogBuilder.findViewById<EditText>(R.id.etDispDtInst)
 
-        // Configurar o Spinner
+
         val types = arrayOf("lampada", "ventilador", "termometro", "higrometro")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerType.adapter = adapter
 
         // Configurar o botão de adicionar
-        val addButton = dialogBuilder.findViewById<Button>(R.id.btnAdd) // Supondo que você tenha um botão com esse ID
+        val addButton = dialogBuilder.findViewById<Button>(R.id.btnAdd)
         addButton.setOnClickListener {
             val nome = editTextName.text.toString()
             val tipo = spinnerType.selectedItem.toString()
@@ -205,7 +206,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
     private fun replaceFragment(fragment: Fragment) {
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(com.example.crud_banco.R.id.frame_container, fragment) // Atualizado
+        fragmentTransaction.replace(com.example.crud_banco.R.id.frame_container, fragment)
         fragmentTransaction.commit()
     }
 

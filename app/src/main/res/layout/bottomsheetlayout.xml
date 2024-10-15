@@ -51,7 +51,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/baseline_video_library_24"/>
+            android:src="@drawable/baseline_control_point_24"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -74,7 +74,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/baseline_whatshot_24"/>
+            android:src="@drawable/baseline_lightbulb_circle_24"></ImageView>
 
         <TextView
             android:layout_width="wrap_content"
@@ -100,7 +100,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/baseline_cast_connected_24"/>
+            android:src="@drawable/baseline_wind_power_24"/>
 
         <TextView
             android:layout_width="wrap_content"
