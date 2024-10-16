@@ -15,9 +15,7 @@ import androidx.appcompat.widget.SwitchCompat
 import com.example.crud_banco.R
 import com.example.crud_banco.models.DispositivosModelo
 import com.example.crud_banco.models.MqttManager
-import com.google.firebase.database.FirebaseDatabase
-
-
+import com.google.firebase.database.*
 
 class DispositivosDetailsActivity : AppCompatActivity() {
 
@@ -33,7 +31,11 @@ class DispositivosDetailsActivity : AppCompatActivity() {
     private lateinit var controlSwitch: SwitchCompat
     private lateinit var mqttManager: MqttManager
 
+    private lateinit var dispTipo: String
+    private lateinit var dispId: String
+    private lateinit var dispAux: String
 
+    private lateinit var topic: String // Adicione uma variável para armazenar o tópico
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,39 +49,43 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
         mqttManager = MqttManager(host, username, password)
 
+        dispTipo = intent.getStringExtra("dispTipo").toString()
+        dispId = intent.getStringExtra("dispId").toString()
+        dispAux = intent.getStringExtra("dispAux").toString()
+
         mqttManager.connect(
             onConnected = {
-                mqttManager.subscribe("casa/luz",
-                    onSubscribed = {
-                        // Configurar o switch após a inscrição
-                        setupSwitch()
-                    },
-                    onError = { Log.d("MainActivity", "Erro ao se inscrever no topic")}
-                )
+                getTopicForDevice() // Chame para obter o tópico
             },
             onError = { Log.d("MainActivity", "Erro na conexão") }
         )
 
-
         btnUpdate.setOnClickListener {
-            openUpdateDialog(
-                intent.getStringExtra("dispId").toString(),
-                intent.getStringExtra("dispNome").toString()
-
-            )
+            openUpdateDialog(dispId, intent.getStringExtra("dispNome").toString())
         }
 
         btnDelete.setOnClickListener {
-            deleteRecord(
-                intent.getStringExtra("dispId").toString()
-            )
+            deleteRecord(dispId)
         }
-
-
     }
 
+    private fun getTopicForDevice() {
+
+
+        topic = if (dispTipo == "lampada")
+        {
+            "casa/luz/$dispAux"
+        } else {
+            "casa/ventilador/$dispAux"
+        }
+
+        setupMqttSubscription(topic)
+        setupSwitch()
+    }
+
+
     private fun setupSwitch() {
-        controlSwitch = findViewById(R.id.controlSwitch) // Certifique-se de que o ID corresponde ao seu layout
+        controlSwitch = findViewById(R.id.controlSwitch)
 
         controlSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
             val message = if (isChecked) {
@@ -88,13 +94,23 @@ class DispositivosDetailsActivity : AppCompatActivity() {
                 "desligar"
             }
 
-            updateDispStatus(intent.getStringExtra("dispId").toString(), message)
-            mqttManager.publish("casa/luz", message,
+            updateDispStatus(dispId, message)
+            mqttManager.publish(topic, message, // Use o tópico armazenado
                 onSuccess = { Log.d("MainActivity", "Mensagem '$message' enviada com sucesso") },
                 onError = { Log.e("MainActivity", "Falha ao enviar mensagem '$message'", it) }
             )
         }
     }
+
+    private fun setupMqttSubscription(topic: String) {
+        mqttManager.subscribe(topic,
+            onSubscribed = {
+                setupSwitch()
+            },
+            onError = { Log.d("MainActivity", "Erro ao se inscrever no tópico") }
+        )
+    }
+
 
     private fun initView() {
         tvDispId = findViewById(R.id.tvDispId)
@@ -117,13 +133,9 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         tvDispLocal.text = intent.getStringExtra("dispLocal")
         tvDispDtInst.text = intent.getStringExtra("dispDtInst")
         tvDispDtAtt.text = intent.getStringExtra("dispDtAtt")
-
     }
 
-    private fun openUpdateDialog(
-        dispId: String,
-        dispNome: String
-    ) {
+    private fun openUpdateDialog(dispId: String, dispNome: String) {
         val mDialog = AlertDialog.Builder(this)
         val inflater = layoutInflater
         val mDialogView = inflater.inflate(R.layout.update_dialog, null)
@@ -145,7 +157,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         etDispDtInst.setText(tvDispDtInst.text.toString())
         etDispDtAtt.setText(tvDispDtAtt.text.toString())
 
-        mDialog.setTitle("Updating $dispNome Record")
+        mDialog.setTitle("Atualizando registro de $dispNome")
 
         val alertDialog = mDialog.create()
         alertDialog.show()
@@ -161,10 +173,9 @@ class DispositivosDetailsActivity : AppCompatActivity() {
                 etDispDtAtt.text.toString(),
             )
 
-            Toast.makeText(applicationContext, "Dispositivos Data Updated", Toast.LENGTH_LONG)
-                .show()
+            Toast.makeText(applicationContext, "Dados do dispositivo atualizados", Toast.LENGTH_LONG).show()
 
-            //we are setting updated data to our textviews
+            // Atualiza os dados nos TextViews
             tvDispName.text = etDispNome.text.toString()
             tvDispTipo.text = etDispTipo.text.toString()
             tvDispStatus.text = etDispStatus.text.toString()
@@ -176,15 +187,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateDispData(
-        id: String,
-        nome: String,
-        tipo: String,
-        status: String,
-        local: String,
-        dtInst: String,
-        dtAtt: String
-    ) {
+    private fun updateDispData(id: String, nome: String, tipo: String, status: String, local: String, dtInst: String, dtAtt: String) {
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp").child(id)
         val dispInfo = DispositivosModelo(id, nome, tipo, status, local, dtInst, dtAtt)
         dbRef.setValue(dispInfo)
@@ -196,7 +199,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         // Atualiza apenas o campo de status
         dbRef.child("dispStatus").setValue(newStatus)
             .addOnSuccessListener {
-                tvDispStatus.text = newStatus.toString()
+                tvDispStatus.text = newStatus
                 Log.d("UpdateStatus", "Status atualizado com sucesso para: $newStatus")
             }
             .addOnFailureListener { error ->
@@ -204,25 +207,20 @@ class DispositivosDetailsActivity : AppCompatActivity() {
             }
     }
 
-
-    private fun deleteRecord(
-        id: String
-    ) {
+    private fun deleteRecord(id: String) {
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp").child(id)
         val mTask = dbRef.removeValue()
 
         mTask.addOnSuccessListener {
-            Toast.makeText(this, "Dispositivo data deleted", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Dados do dispositivo deletados", Toast.LENGTH_LONG).show()
 
             val intent = Intent(this, MainActivity::class.java)
             finish()
             startActivity(intent)
         }.addOnFailureListener { error ->
-            Toast.makeText(this, "Deleting Err ${error.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Erro ao deletar: ${error.message}", Toast.LENGTH_LONG).show()
         }
-
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

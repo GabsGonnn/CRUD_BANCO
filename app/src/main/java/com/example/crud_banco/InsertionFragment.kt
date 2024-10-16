@@ -9,14 +9,19 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.crud_banco.models.DispositivosModelo
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class InsertionFragment : Fragment() {
 
     private lateinit var dbRef: DatabaseReference
+    private lateinit var lastIdRef: DatabaseReference
 
     private lateinit var etDispNome: EditText
     private lateinit var etDispTipo: EditText
@@ -37,6 +42,10 @@ class InsertionFragment : Fragment() {
         btnSalvar = view.findViewById(R.id.btnSalvar)
 
         dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp")
+        lastIdRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp/lastId")
+
+        // Inicializa o último ID se não existir
+        initializeLastId()
 
         btnSalvar.setOnClickListener {
             val dispNome = etDispNome.text.toString()
@@ -68,24 +77,50 @@ class InsertionFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val dispId = dbRef.push().key ?: ""
-
-            val dispositivos = DispositivosModelo(dispId, dispNome, dispTipo, dispStatus, dispLocal, dispDtInst, dispDtAtt)
-
-            dbRef.child(dispId).setValue(dispositivos)
-                .addOnCompleteListener {
-                    Toast.makeText(requireContext(), "Dado inserido com sucesso", Toast.LENGTH_SHORT).show()
-
-                    etDispNome.text.clear()
-                    etDispTipo.text.clear()
-                    etDispDtInst.text.clear()
-                    etDispLocal.text.clear()
-
-                }.addOnFailureListener { err ->
-                    Toast.makeText(requireContext(), "Erro ${err.message}", Toast.LENGTH_SHORT).show()
+            // Obter o último ID usado
+            lastIdRef.runTransaction(object : Transaction.Handler {
+                override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                    val currentId = mutableData.value as? Long ?: 0
+                    mutableData.value = currentId + 1 // Incrementa o último ID
+                    return Transaction.success(mutableData)
                 }
+
+                override fun onComplete(
+                    error: DatabaseError?,
+                    committed: Boolean,
+                    currentData: DataSnapshot?
+                ) {
+                    if (committed) {
+                        val dispId = currentData?.value.toString() // Usa o novo ID
+
+                        val dispositivos = DispositivosModelo(dispId, dispNome, dispTipo, dispStatus, dispLocal, dispDtInst, dispDtAtt)
+
+                        dbRef.child(dispId).setValue(dispositivos)
+                            .addOnCompleteListener {
+                                Toast.makeText(requireContext(), "Dado inserido com sucesso", Toast.LENGTH_SHORT).show()
+                                // Limpa os campos
+                                etDispNome.text.clear()
+                                etDispTipo.text.clear()
+                                etDispDtInst.text.clear()
+                                etDispLocal.text.clear()
+                            }.addOnFailureListener { err ->
+                                Toast.makeText(requireContext(), "Erro ${err.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    } else {
+                        Toast.makeText(requireContext(), "Erro ao gerar ID", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
         }
 
         return view
+    }
+
+    private fun initializeLastId() {
+        lastIdRef.get().addOnSuccessListener { snapshot ->
+            if (!snapshot.exists()) {
+                lastIdRef.setValue(0) // Inicializa com 0 se não existir
+            }
+        }
     }
 }

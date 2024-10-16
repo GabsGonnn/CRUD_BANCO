@@ -9,5 +9,6 @@ class DispositivosModelo(
     var dispStatus: String? = null,
     var dispLocal: String? = null,
     var dispDtInst: String? = null,
-    var dispDtAtt: String? = null
+    var dispDtAtt: String? = null,
+    var dispAux: String? = null
 )

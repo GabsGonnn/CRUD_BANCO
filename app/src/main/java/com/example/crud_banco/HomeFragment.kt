@@ -29,7 +29,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Infle o layout para este fragmento
+
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         // Inicialize as views
@@ -58,10 +58,8 @@ class HomeFragment : Fragment() {
                     for (empSnap in snapshot.children) {
                         val empData = empSnap.getValue(DispositivosModelo::class.java)
                         empData?.let {
-                            // Filtra os dispositivos por tipo
-                            if (it.dispTipo == "lampada" || it.dispTipo == "ventilador") {
                                 dispList.add(it)
-                            }
+
                         }
                     }
                     val mAdapter = DispAdapter(dispList)
@@ -71,7 +69,7 @@ class HomeFragment : Fragment() {
                         override fun onItemClick(position: Int) {
                             val intent = Intent(requireContext(), DispositivosDetailsActivity::class.java)
 
-                            // Coloque extras
+
                             intent.putExtra("dispId", dispList[position].dispId)
                             intent.putExtra("dispNome", dispList[position].dispNome)
                             intent.putExtra("dispTipo", dispList[position].dispTipo)
@@ -79,6 +77,7 @@ class HomeFragment : Fragment() {
                             intent.putExtra("dispLocal", dispList[position].dispLocal)
                             intent.putExtra("dispDtInst", dispList[position].dispDtInst)
                             intent.putExtra("dispDtAtt", dispList[position].dispDtAtt)
+                            intent.putExtra("dispAux", dispList[position].dispAux)
                             startActivity(intent)
                         }
                     })
@@ -89,8 +88,9 @@ class HomeFragment : Fragment() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Tratar erro se necessário
+                TODO("Not yet implemented")
             }
+
         })
     }
 }

@@ -79,6 +79,7 @@ class SensorFragment : Fragment() {
         sensorAdapter.setOnItemClickListener(object : SensorAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
                 val intent = Intent(requireContext(), SensorDetailsActivity::class.java)
+                intent.putExtra("dispId", sensorList[position].dispId)
                 intent.putExtra("nome", sensorList[position].nome)
                 intent.putExtra("valor", sensorList[position].valor)
                 intent.putExtra("unidade", sensorList[position].unidade)

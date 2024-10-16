@@ -35,8 +35,11 @@ import com.example.crud_banco.databinding.ActivityMainBinding
 import com.example.crud_banco.models.DispositivosModelo
 import com.example.crud_banco.models.Sensor
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
@@ -130,13 +133,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogBuilder.setContentView(R.layout.insertion_controle_ventilador_dialog)
 
-        // Use dialogBuilder para encontrar os views dentro do diálogo
         val seekBar = dialogBuilder.findViewById<SeekBar>(R.id.seekBar)
         val seekBarValue = dialogBuilder.findViewById<TextView>(R.id.seekBarValue)
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                // Atualizar o valor exibido no TextView
                 seekBarValue.text = (progress + 1).toString() // Adiciona 1 para mostrar de 1 a 100
             }
 
@@ -183,19 +184,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val local = editTextLocation.text.toString()
             val date = editTextDate.text.toString()
 
-            if (tipo == "lâmpada" || tipo == "ventilador") {
+            if (tipo == "lampada" || tipo == "ventilador") {
                 val dbRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Exemplo_Disp")
-                val dispId = dbRef.push().key ?: ""
-                val dispositivosss = DispositivosModelo(dispId, nome, tipo, "desligado", local, date, date)
 
-                dbRef.child(dispId).setValue(dispositivosss)
-                    .addOnCompleteListener {
-                        Toast.makeText(this, "Dado inserido com sucesso", Toast.LENGTH_SHORT).show()
-                        clearFields(editTextName, editTextLocation, editTextDate, spinnerType)
-                        dialogBuilder.dismiss()
-                    }.addOnFailureListener { err ->
-                        Toast.makeText(this, "Erro ${err.message}", Toast.LENGTH_SHORT).show()
+                dbRef.orderByChild("dispTipo").equalTo(tipo).addListenerForSingleValueEvent(object :
+                    ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val count = snapshot.children.count() +1
+
+                        val dispId = dbRef.push().key ?: ""
+                        val dispositivosss = DispositivosModelo(dispId, nome, tipo, "desligado", local, date, date,count.toString())
+
+                        dbRef.child(dispId).setValue(dispositivosss)
+                            .addOnCompleteListener {
+                                Toast.makeText(this@MainActivity, "Dado inserido com sucesso", Toast.LENGTH_SHORT).show()
+                                clearFields(editTextName, editTextLocation, editTextDate, spinnerType)
+                                dialogBuilder.dismiss()
+                            }.addOnFailureListener { err ->
+                                Toast.makeText(this@MainActivity, "Erro ${err.message}", Toast.LENGTH_SHORT).show()
+                            }
                     }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(this@MainActivity, "Erro ao contar dispositivos: ${error.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
+
             } else {
                 val dbRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Exemplo_Sensores")
                 val dispId = dbRef.push().key ?: ""
