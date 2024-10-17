@@ -1,5 +1,6 @@
 package com.example.crud_banco.activities
 
+import android.app.DatePickerDialog
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
@@ -40,6 +41,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
@@ -164,17 +166,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogBuilder.setContentView(R.layout.insertion_dispositivo_dialog)
 
-
         val editTextName = dialogBuilder.findViewById<EditText>(R.id.etDispNome)
         val spinnerType = dialogBuilder.findViewById<Spinner>(R.id.spinnerType)
         val editTextLocation = dialogBuilder.findViewById<EditText>(R.id.etDispLocal)
-        val editTextDate = dialogBuilder.findViewById<EditText>(R.id.etDispDtInst)
+        val textViewDate = dialogBuilder.findViewById<TextView>(R.id.tvDispDtInst)
+        val buttonPickDate = dialogBuilder.findViewById<Button>(R.id.btnPickDate)
 
-
-        val types = arrayOf("Selecione um tipo","lampada", "ventilador", "termometro", "higrometro")
+        val types = arrayOf("lampada", "ventilador", "termometro", "higrometro")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerType.adapter = adapter
+
+        // Configurar o botão de selecionar data
+        buttonPickDate.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(this,
+                { _, selectedYear, selectedMonth, selectedDay ->
+                    val formattedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                    textViewDate.text = formattedDate // Atualiza o TextView com a data selecionada
+                }, year, month, day)
+            datePickerDialog.show()
+        }
 
         // Configurar o botão de adicionar
         val addButton = dialogBuilder.findViewById<Button>(R.id.btnAdd)
@@ -182,7 +198,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val nome = editTextName.text.toString()
             val tipo = spinnerType.selectedItem.toString()
             val local = editTextLocation.text.toString()
-            val date = editTextDate.text.toString()
+            val date = textViewDate.text.toString()
 
             if (tipo == "lampada" || tipo == "ventilador") {
                 val dbRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Exemplo_Disp")
@@ -190,15 +206,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 dbRef.orderByChild("dispTipo").equalTo(tipo).addListenerForSingleValueEvent(object :
                     ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val count = snapshot.children.count() +1
-
+                        val count = snapshot.children.count() + 1
                         val dispId = dbRef.push().key ?: ""
-                        val dispositivosss = DispositivosModelo(dispId, nome, tipo, "desligado", local, date, date,count.toString())
+                        val dispositivosss = DispositivosModelo(dispId, nome, tipo, "desligado", local, date, date, count.toString())
 
                         dbRef.child(dispId).setValue(dispositivosss)
                             .addOnCompleteListener {
                                 Toast.makeText(this@MainActivity, "Dado inserido com sucesso", Toast.LENGTH_SHORT).show()
-                                clearFields(editTextName, editTextLocation, editTextDate, spinnerType)
+                                clearFields(editTextName, editTextLocation, textViewDate, spinnerType)
                                 dialogBuilder.dismiss()
                             }.addOnFailureListener { err ->
                                 Toast.makeText(this@MainActivity, "Erro ${err.message}", Toast.LENGTH_SHORT).show()
@@ -213,28 +228,38 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             } else {
                 val dbRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Exemplo_Sensores")
                 val dispId = dbRef.push().key ?: ""
-                val dispositivosss = Sensor(dispId, nome, tipo, "0", "0", date)
 
-                dbRef.child(dispId).setValue(dispositivosss)
-                    .addOnCompleteListener {
-                        Toast.makeText(this, "Dado inserido com sucesso", Toast.LENGTH_SHORT).show()
-                        clearFields(editTextName, editTextLocation, editTextDate, spinnerType)
-                        dialogBuilder.dismiss()
-                    }.addOnFailureListener { err ->
-                        Toast.makeText(this, "Erro ${err.message}", Toast.LENGTH_SHORT).show()
+                dbRef.orderByChild("dispTipo").equalTo(tipo).addListenerForSingleValueEvent(object :
+                    ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val count = snapshot.children.count() + 1
+                        val dispositivosss = Sensor(dispId, nome, tipo, "0", count.toString(), date )
+
+                        dbRef.child(dispId).setValue(dispositivosss)
+                            .addOnCompleteListener {
+                                Toast.makeText(this@MainActivity, "Dado inserido com sucesso", Toast.LENGTH_SHORT).show()
+                                clearFields(editTextName, editTextLocation, textViewDate, spinnerType)
+                                dialogBuilder.dismiss()
+                            }.addOnFailureListener { err ->
+                                Toast.makeText(this@MainActivity, "Erro ${err.message}", Toast.LENGTH_SHORT).show()
+                            }
                     }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        // Handle error
+                    }
+                })
             }
         }
-
 
         dialogBuilder.show()
         dialogBuilder.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
-    private fun clearFields(editTextName: EditText, editTextLocation: EditText, editTextDate: EditText, spinnerType: Spinner) {
+    private fun clearFields(editTextName: EditText, editTextLocation: EditText, etDate: TextView, spinnerType: Spinner) {
         editTextName.text.clear()
         editTextLocation.text.clear()
-        editTextDate.text.clear()
+        etDate.text = "Data de Instalação"
         spinnerType.setSelection(0)
     }
 

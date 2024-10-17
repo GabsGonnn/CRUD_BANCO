@@ -124,7 +124,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="Unidade"
+                    android:text="Data
+                    Instalação"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold" />

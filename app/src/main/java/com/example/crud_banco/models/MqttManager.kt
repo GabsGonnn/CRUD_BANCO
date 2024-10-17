@@ -3,10 +3,11 @@ package com.example.crud_banco.models
 import android.util.Log
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient
-import com.hivemq.client.mqtt.MqttGlobalPublishFilter.ALL
+import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets.UTF_8
 
 class MqttManager(
@@ -15,6 +16,7 @@ class MqttManager(
     private val password: String
 ) {
     private lateinit var client: Mqtt5AsyncClient
+    private var messageCallback: ((String) -> Unit)? = null
 
     fun connect(onConnected: () -> Unit, onError: (Throwable) -> Unit) {
         // Criar um cliente MQTT assíncrono
@@ -64,6 +66,13 @@ class MqttManager(
             try {
                 client.subscribeWith()
                     .topicFilter(topic)
+                    .callback { publish: Mqtt5Publish ->
+                        val payloadOptional = publish.payload
+                        if (payloadOptional.isPresent) {
+                            val message = UTF_8.decode(payloadOptional.get()).toString()
+                            messageCallback?.invoke(message) // Chama o callback com a mensagem recebida
+                        }
+                    }
                     .send()
                     .whenComplete { _, throwable ->
                         if (throwable != null) {
@@ -79,6 +88,10 @@ class MqttManager(
                 onError(e)
             }
         }
+    }
+
+    fun setMessageCallback(callback: (String) -> Unit) {
+        this.messageCallback = callback
     }
 
     fun publish(topic: String, message: String, onSuccess: () -> Unit, onError: (Throwable) -> Unit) {

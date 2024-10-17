@@ -82,7 +82,10 @@ class SensorFragment : Fragment() {
                 intent.putExtra("dispId", sensorList[position].dispId)
                 intent.putExtra("nome", sensorList[position].nome)
                 intent.putExtra("valor", sensorList[position].valor)
-                intent.putExtra("unidade", sensorList[position].unidade)
+                intent.putExtra("tipoSensor",sensorList[position].tipoSensor)
+                intent.putExtra("aux",sensorList[position].aux)
+                intent.putExtra("timestamp", sensorList[position].timestamp)
+
                 startActivity(intent)
             }
         })

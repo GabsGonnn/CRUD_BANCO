@@ -5,13 +5,18 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-
     <EditText
         android:id="@+id/etDispNome"
         android:layout_width="400dp"
         android:layout_height="50dp"
         android:hint="Nome" />
 
+    <TextView
+        android:id="@+id/tvDispTipo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selecione o Tipo "
+        android:layout_marginTop="16dp" />
     <Spinner
         android:id="@+id/spinnerType"
         android:layout_width="match_parent"
@@ -23,11 +28,18 @@
         android:layout_height="50dp"
         android:hint="Local" />
 
-    <EditText
-        android:id="@+id/etDispDtInst"
+    <TextView
+        android:id="@+id/tvDispDtInst"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:hint="Data de Instalação. Ex(19/04/2024)" />
+        android:layout_height="wrap_content"
+        android:text="Data de Instalação"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnPickDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selecionar Data" />
 
     <Button
         android:id="@+id/btnAdd"
@@ -36,7 +48,5 @@
         android:text="Adicionar"
         android:textColor="@android:color/white"
         android:layout_marginTop="16dp"/>
-
-
 
 </LinearLayout>

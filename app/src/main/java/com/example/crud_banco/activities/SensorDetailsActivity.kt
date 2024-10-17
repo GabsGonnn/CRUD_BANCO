@@ -2,6 +2,8 @@ package com.example.crud_banco.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -9,8 +11,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.crud_banco.R
+import com.example.crud_banco.models.MqttManager
 import com.example.crud_banco.models.Sensor
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class SensorDetailsActivity : AppCompatActivity() {
     private lateinit var tvnome: TextView
@@ -18,6 +24,14 @@ class SensorDetailsActivity : AppCompatActivity() {
     private lateinit var tvdata: TextView
     private lateinit var btnUpdate: Button
     private lateinit var btnDelete: Button
+    private lateinit var mqttManager: MqttManager
+
+    private lateinit var tipoSensor: String
+    private lateinit var dispId: String
+    private lateinit var aux: String
+    private lateinit var timestamp: String
+    private lateinit var topic: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,26 +39,77 @@ class SensorDetailsActivity : AppCompatActivity() {
         initView()
         setValuesToViews()
 
+        val host = "5c4f71f03f934cd08ccae931b3d4a457.s1.eu.hivemq.cloud"
+        val username = "admin"
+        val password = "Admin1234!"
+
+        mqttManager = MqttManager(host, username, password)
+
+        tipoSensor = intent.getStringExtra("tipoSensor").toString()
+        dispId = intent.getStringExtra("dispId").toString()
+        aux = intent.getStringExtra("aux").toString()
+        timestamp = intent.getStringExtra("timestamp").toString()
+
+        mqttManager.connect(
+            onConnected = {
+                getTopicForSensor()
+            },
+            onError = { Log.d("SensorDetailsActivity", "Erro na conexão") }
+        )
+
         btnUpdate.setOnClickListener {
-            openUpdateDialog(
-                intent.getStringExtra("dispId").toString(),
-                intent.getStringExtra("dispNome").toString()
-            )
+            openUpdateDialog(dispId, intent.getStringExtra("dispNome").toString())
         }
 
         btnDelete.setOnClickListener {
-            deleteRecord(
-                intent.getStringExtra("dispId").toString()
-            )
+            deleteRecord(dispId)
         }
+    }
+
+    private fun getTopicForSensor() {
+        topic = if (tipoSensor == "termometro") {
+            "casa/temperatura/$aux"
+        } else {
+            "casa/umidade/$aux"
+        }
+
+        setupMqttSubscription(topic)
+    }
+
+    private fun setupMqttSubscription(topic: String) {
+        mqttManager.subscribe(topic,
+            onSubscribed = {
+                // Aqui você pode implementar a lógica para lidar com mensagens recebidas
+                mqttManager.setMessageCallback { message ->
+                    handleSensorUpdate(message)
+                }
+            },
+            onError = { Log.d("SensorDetailsActivity", "Erro ao se inscrever no tópico") }
+        )
+    }
+
+    private fun handleSensorUpdate(message: String) {
+        // Atualiza a UI com o novo valor recebido
+        val valor : String = message.toString()
+        var text: String? = null
+        if (tipoSensor == "termometro"){
+            text  = (valor +" ºC")
+        }else{
+            text = (valor +"%")
+        }
+
+        tvacao.text = text
+
+        // Atualiza o valor no Firebase
+        updateSensorData(dispId, tvnome.text.toString(), tipoSensor, message)
     }
 
     private fun initView() {
         tvnome = findViewById(R.id.tvlogId)
         tvacao = findViewById(R.id.tvacao)
         tvdata = findViewById(R.id.tvData)
-        btnUpdate = findViewById(R.id.btnUpdateSen) // Inicializando o botão de atualizar
-        btnDelete = findViewById(R.id.btnDeleteSen) // Inicializando o botão de deletar
+        btnUpdate = findViewById(R.id.btnUpdateSen)
+        btnDelete = findViewById(R.id.btnDeleteSen)
     }
 
     private fun setValuesToViews() {
@@ -70,20 +135,20 @@ class SensorDetailsActivity : AppCompatActivity() {
 
         val btnUpdateDataSen = mDialogView.findViewById<Button>(R.id.btnUpdateDataSen)
 
-        mDialog.setTitle("Updating $dispNome Record")
+        mDialog.setTitle("Atualizando registro de $dispNome")
 
         val alertDialog = mDialog.create()
         alertDialog.show()
 
         btnUpdateDataSen.setOnClickListener {
-            updateDispData(
+            updateSensorData(
                 dispId,
                 etsenNome.text.toString(),
-                etsenValor.text.toString(),
-                etsenUnidade.text.toString()
+                tipoSensor, // Certifique-se de que o tipoSensor não está sendo alterado
+                etsenValor.text.toString()
             )
 
-            Toast.makeText(applicationContext, "Dispositivo Data Updated", Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Dados do sensor atualizados", Toast.LENGTH_LONG).show()
 
             // Atualiza os textos na Activity
             tvnome.text = etsenNome.text.toString()
@@ -94,10 +159,17 @@ class SensorDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateDispData(id: String, nome: String, tipo: String, status: String) {
+    private fun updateSensorData(id: String, nome: String, tipo: String, valor: String) {
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Sensores").child(id)
-        val dispInfo = Sensor(id, nome, tipo, status)
-        dbRef.setValue(dispInfo)
+        val sensorInfo = Sensor(id, nome, tipo, valor, aux, timestamp)
+
+        dbRef.setValue(sensorInfo)
+            .addOnSuccessListener {
+                Log.d("SensorDetailsActivity", "Dados do sensor atualizados no Firebase")
+            }
+            .addOnFailureListener { error ->
+                Log.e("SensorDetailsActivity", "Falha ao atualizar dados no Firebase", error)
+            }
     }
 
     private fun deleteRecord(id: String) {
@@ -105,13 +177,18 @@ class SensorDetailsActivity : AppCompatActivity() {
         val mTask = dbRef.removeValue()
 
         mTask.addOnSuccessListener {
-            Toast.makeText(this, "Dispositivo data deleted", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Dados do sensor deletados", Toast.LENGTH_LONG).show()
 
             val intent = Intent(this, MainActivity::class.java)
             finish()
             startActivity(intent)
         }.addOnFailureListener { error ->
-            Toast.makeText(this, "Deleting Err: ${error.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Erro ao deletar: ${error.message}", Toast.LENGTH_LONG).show()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mqttManager.disconnect()
     }
 }
