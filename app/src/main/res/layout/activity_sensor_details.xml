@@ -18,7 +18,7 @@
         <LinearLayout
             android:id="@+id/id_lin"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
@@ -31,6 +31,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
                 android:background="@color/yellow">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -38,7 +39,8 @@
                     android:gravity="center"
                     android:text="Sensor"
                     android:textColor="@color/black"
-                    android:textSize="15sp" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -73,6 +75,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
                 android:background="@color/yellow">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -80,7 +83,8 @@
                     android:gravity="center"
                     android:text="Valor"
                     android:textColor="@color/black"
-                    android:textSize="15sp" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -114,6 +118,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
                 android:background="@color/yellow">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -121,7 +126,8 @@
                     android:gravity="center"
                     android:text="Unidade"
                     android:textColor="@color/black"
-                    android:textSize="15sp"/>
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -142,13 +148,16 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnUpdateSen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="Atualizar"
         android:background="@drawable/button_background"
+        android:text="Atualizar"
+        android:textSize="14sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/btnDeleteSen"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -159,8 +168,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="Deletar"
         android:background="@drawable/button_background"
+        android:text="Deletar"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btnUpdateSen"

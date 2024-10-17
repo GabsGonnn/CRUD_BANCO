@@ -28,7 +28,14 @@ class LogAdapter(private val dispList: ArrayList<LogModelo>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) { // Corrigido para ViewHolder
         val currentDisp = dispList[position]
-        holder.tvDispName.text = currentDisp.timestamp
+        val logname = currentDisp.lognome
+        val loghoras = currentDisp.loghora
+
+        val bum: String = loghoras.toString()
+        val buma: String = logname.toString()
+
+        val text: String = (buma + " - " + bum)
+        holder.tvDispName.text = text
     }
 
     override fun getItemCount(): Int {

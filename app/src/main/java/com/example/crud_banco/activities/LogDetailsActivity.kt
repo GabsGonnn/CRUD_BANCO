@@ -9,6 +9,7 @@ class LogDetailsActivity : AppCompatActivity(){
     private lateinit var tvnome: TextView
     private lateinit var tvacao: TextView
     private lateinit var tvdata: TextView
+    private lateinit var tvhora: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,11 +22,13 @@ class LogDetailsActivity : AppCompatActivity(){
         tvnome = findViewById(R.id.tvlogId)
         tvacao = findViewById(R.id.tvacao)
         tvdata = findViewById(R.id.tvData)
+        tvhora = findViewById(R.id.tvlogHora)
     }
 
     private fun setValuesToViews() {
         tvnome.text = intent.getStringExtra("nome")
         tvacao.text = intent.getStringExtra("acao")
         tvdata.text = intent.getStringExtra("timestamp")
+        tvhora.text = intent.getStringExtra("hora")
     }
 }

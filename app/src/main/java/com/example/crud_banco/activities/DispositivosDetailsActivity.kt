@@ -1,6 +1,7 @@
 package com.example.crud_banco.activities
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,13 +10,19 @@ import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import com.example.crud_banco.R
 import com.example.crud_banco.models.DispositivosModelo
+import com.example.crud_banco.models.LogModelo
 import com.example.crud_banco.models.MqttManager
 import com.google.firebase.database.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class DispositivosDetailsActivity : AppCompatActivity() {
 
@@ -34,6 +41,8 @@ class DispositivosDetailsActivity : AppCompatActivity() {
     private lateinit var dispTipo: String
     private lateinit var dispId: String
     private lateinit var dispAux: String
+
+    private lateinit var dbRef2: DatabaseReference
 
     private lateinit var topic: String // Adicione uma variável para armazenar o tópico
 
@@ -68,6 +77,18 @@ class DispositivosDetailsActivity : AppCompatActivity() {
             deleteRecord(dispId)
         }
     }
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getCurrentDateOnly(): String {
+        val currentDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        return currentDate.format(formatter)
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getCurrentDateOnlyhora(): String {
+        val currentTimehora = LocalTime.now()
+        val formatterhora = DateTimeFormatter.ofPattern("HH:mm")
+        return currentTimehora.format(formatterhora)
+    }
 
     private fun getTopicForDevice() {
 
@@ -93,8 +114,27 @@ class DispositivosDetailsActivity : AppCompatActivity() {
             } else {
                 "desligar"
             }
-
             updateDispStatus(dispId, message)
+
+            val acao = message
+            dbRef2 = FirebaseDatabase.getInstance().getReference("logs_atividade")
+
+            val lognome = intent.getStringExtra("dispNome")
+            val logtimestamp = getCurrentDateOnly()
+            val logtimestamphora = getCurrentDateOnlyhora()
+
+            val dispId = dbRef2.push().key?: ""
+
+            val loggg = LogModelo(dispId,lognome, acao, logtimestamp, logtimestamphora)
+
+            dbRef2.child(dispId).setValue(loggg)
+                .addOnCompleteListener{
+                    Toast.makeText(this,"Dado inserido com sucesso",Toast.LENGTH_SHORT).show()
+
+                }.addOnFailureListener{ err->
+                    Toast.makeText(this,"Erro ${err.message}",Toast.LENGTH_SHORT).show()
+                }
+
             mqttManager.publish(topic, message, // Use o tópico armazenado
                 onSuccess = { Log.d("MainActivity", "Mensagem '$message' enviada com sucesso") },
                 onError = { Log.e("MainActivity", "Falha ao enviar mensagem '$message'", it) }

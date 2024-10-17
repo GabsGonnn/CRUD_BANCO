@@ -29,10 +29,9 @@ class HistoricoFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Infle o layout para este fragmento
+
         val view = inflater.inflate(R.layout.fragment_historico, container, false)
 
-        // Inicialize as views
         dispRecyclerView = view.findViewById(R.id.rvDisp)
         dispRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         dispRecyclerView.setHasFixedSize(true)
@@ -66,9 +65,10 @@ class HistoricoFragment : Fragment() {
                         override fun onItemClick(position: Int) {
                             val intent = Intent(requireContext(), LogDetailsActivity::class.java)
 
-                            intent.putExtra("nome", dispList[position].nome)
-                            intent.putExtra("acao", dispList[position].acao)
-                            intent.putExtra("timestamp", dispList[position].timestamp)
+                            intent.putExtra("nome", dispList[position].lognome)
+                            intent.putExtra("acao", dispList[position].logacao)
+                            intent.putExtra("timestamp", dispList[position].logtimestamp)
+                            intent.putExtra("hora", dispList[position].loghora)
                             startActivity(intent)
                         }
                     })
