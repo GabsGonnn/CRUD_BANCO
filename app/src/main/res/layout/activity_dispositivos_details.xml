@@ -59,61 +59,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-        <LinearLayout
-            android:id="@+id/id_lin"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/material_dynamic_neutral70"
-            android:orientation="horizontal"
-            android:weightSum="2"
-
-            >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.6"
-                android:background="@color/yellow">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="Disp id"
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1.4"
-                android:background="@drawable/border_background">
-
-                <TextView
-
-                    android:id="@+id/tvDispId"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text=""
-
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-
-                    />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
 
         <LinearLayout
             android:id="@+id/contact_lin"
@@ -136,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="Disp Nome"
+                    android:text="Nome"
                     android:textColor="@color/black"
                     android:textSize="15sp" />
 
@@ -188,7 +133,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:text="Disp Tipo"
+                    android:text="Tipo"
                     android:textColor="@color/black"
                     android:textSize="15sp"
 
@@ -221,62 +166,6 @@
         </LinearLayout>
 
 
-        <LinearLayout
-
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/material_dynamic_neutral70"
-            android:orientation="horizontal"
-            android:weightSum="2"
-
-            >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.6"
-                android:background="@color/yellow">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-
-                    android:gravity="center"
-                    android:text="Disp Status"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-
-
-                    />
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1.4"
-                android:background="@drawable/border_background">
-
-                <TextView
-                    android:id="@+id/tvDispStatus"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-
-                    />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
 
         <LinearLayout
 
@@ -302,7 +191,7 @@
                     android:layout_gravity="center"
 
                     android:gravity="center"
-                    android:text="Disp Local"
+                    android:text="Local"
                     android:textColor="@color/black"
                     android:textSize="15sp"
 
@@ -360,7 +249,8 @@
                     android:layout_gravity="center"
 
                     android:gravity="center"
-                    android:text="Disp Data Intalação"
+                    android:text="Data
+                    Instalação"
                     android:textColor="@color/black"
                     android:textSize="15sp"
 
@@ -393,62 +283,7 @@
 
         </LinearLayout>
 
-        <LinearLayout
 
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/material_dynamic_neutral70"
-            android:orientation="horizontal"
-            android:weightSum="2"
-
-            >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.6"
-                android:background="@color/yellow">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-
-                    android:gravity="center"
-                    android:text="Disp Data Atualização"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-
-
-                    />
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1.4"
-                android:background="@drawable/border_background">
-
-                <TextView
-                    android:id="@+id/tvDispDtAtt"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text=""
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-
-                    />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
 
     </LinearLayout>
 

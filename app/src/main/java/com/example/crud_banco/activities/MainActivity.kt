@@ -1,10 +1,16 @@
 package com.example.crud_banco.activities
 
+import android.Manifest
+import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -27,12 +33,16 @@ import android.widget.LinearLayout
 import android.widget.NumberPicker
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.TimePicker
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.example.crud_banco.ControleFragment
 import com.example.crud_banco.HistoricoFragment
 import com.example.crud_banco.SensorFragment
 import com.example.crud_banco.databinding.ActivityMainBinding
+import com.example.crud_banco.models.Controle
 import com.example.crud_banco.models.DispositivosModelo
 import com.example.crud_banco.models.Sensor
 import com.google.android.material.navigation.NavigationView
@@ -56,6 +66,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) != PackageManager.PERMISSION_GRANTED) {
+                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                startActivity(intent)
+            }
+        }
+
         setSupportActionBar(binding.toolbar)
         val toggle = ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar,
             com.example.crud_banco.R.string.open_nav, com.example.crud_banco.R.string.close_nav)
@@ -69,7 +86,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when (item.itemId) {
                 com.example.crud_banco.R.id.home -> replaceFragment(HomeFragment())
                 com.example.crud_banco.R.id.shorts -> replaceFragment(SensorFragment())
-                //com.example.crud_banco.R.id.Incricoes -> replaceFragment(HistoricoFragment())
+                com.example.crud_banco.R.id.Incricoes -> replaceFragment(ControleFragment())
                 com.example.crud_banco.R.id.Biblioteca -> replaceFragment(HistoricoFragment())
             }
             true
@@ -100,7 +117,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val dispDialog = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutVideo)
         val controlLuzDialog = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutShorts)
-        val controlVentDialog = builder.findViewById<LinearLayout>(com.example.crud_banco.R.id.layoutLive)
         val cancelButton = builder.findViewById<ImageView>(com.example.crud_banco.R.id.cancelButton)
 
 
@@ -114,11 +130,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             showControleLuzDialog()
         }
 
-        controlVentDialog.setOnClickListener {
-            builder.dismiss()
-            showControleVentDialog()
-        }
-
         cancelButton.setOnClickListener {
             builder.dismiss()
         }
@@ -130,34 +141,120 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         builder.window?.setGravity(Gravity.BOTTOM)
     }
 
-    private fun showControleVentDialog() {
-        val dialogBuilder = Dialog(this)
-        dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialogBuilder.setContentView(R.layout.insertion_controle_ventilador_dialog)
-
-        val seekBar = dialogBuilder.findViewById<SeekBar>(R.id.seekBar)
-        val seekBarValue = dialogBuilder.findViewById<TextView>(R.id.seekBarValue)
-
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                seekBarValue.text = (progress + 1).toString() // Adiciona 1 para mostrar de 1 a 100
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        dialogBuilder.show()
-        dialogBuilder.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    }
 
     private fun showControleLuzDialog() {
         val dialogBuilder = Dialog(this)
         dialogBuilder.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogBuilder.setContentView(R.layout.insertion_controle_luz_dialog)
 
+        // Inicializando os componentes do diálogo
+        val spinnerNome = dialogBuilder.findViewById<Spinner>(R.id.spinnerLuzNome)
+        val spinnerAcao = dialogBuilder.findViewById<Spinner>(R.id.spinnerLuzAção)
+        val timePicker = dialogBuilder.findViewById<TimePicker>(R.id.timePickerLuz)
+        val addButton = dialogBuilder.findViewById<Button>(R.id.btnAdd)
+
+        // Carregar nomes dos dispositivos do banco "Exemplo_Disp"
+        val dbRefDisp = FirebaseDatabase.getInstance().getReference("Exemplo_Disp")
+        val nomes = mutableListOf<String>()
+
+        dbRefDisp.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    for (dispositivoSnap in snapshot.children) {
+                        val dispositivo = dispositivoSnap.getValue(DispositivosModelo::class.java)
+                        dispositivo?.let {
+                            nomes.add(it.dispNome ?: "Nome Desconhecido") // Adiciona o nome do dispositivo
+                        }
+                    }
+                    val adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_item, nomes)
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    spinnerNome.adapter = adapter
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@MainActivity, "Erro ao carregar dispositivos: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        // Configurando o Spinner para ações
+        val acoes = arrayOf("ligar", "desligar") // Ações disponíveis
+        val acaoAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, acoes)
+        acaoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerAcao.adapter = acaoAdapter
+
+        // Configurando o botão de adicionar
+        addButton.setOnClickListener {
+            val nomeSelecionado = spinnerNome.selectedItem.toString()
+            val acaoSelecionada = spinnerAcao.selectedItem.toString()
+            val hora = timePicker.hour
+            val minuto = timePicker.minute
+
+            // Formatar a hora em string
+            val horaFormatada = String.format("%02d:%02d", hora, minuto)
+
+            // Buscar o tipo e o valor "aux" do dispositivo selecionado
+            dbRefDisp.orderByChild("dispNome").equalTo(nomeSelecionado).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val dispositivo = snapshot.children.first().getValue(DispositivosModelo::class.java)
+                        dispositivo?.let {
+                            val tipoDisp = it.dispTipo // Supondo que você tenha um campo dispTipo
+                            val aux = it.dispAux // Supondo que você tenha um campo aux
+
+                            // Adicionar ao banco "Funci_Luz"
+                            val dbRefFunc = FirebaseDatabase.getInstance().getReference("Funci_Luz")
+                            val controleId = dbRefFunc.push().key ?: ""
+
+                            val controleLuz = Controle(controleId, nomeSelecionado, acaoSelecionada, horaFormatada, tipoDisp, aux)
+
+                            dbRefFunc.child(controleId).setValue(controleLuz)
+                                .addOnCompleteListener {
+                                    Toast.makeText(this@MainActivity, "Controle de Luz adicionado com sucesso", Toast.LENGTH_SHORT).show()
+                                    dialogBuilder.dismiss()
+
+                                    // Agendar a ação
+                                    scheduleAction(hora, minuto, nomeSelecionado, acaoSelecionada, tipoDisp.toString(), aux.toString(), )
+                                }.addOnFailureListener { err ->
+                                    Toast.makeText(this@MainActivity, "Erro: ${err.message}", Toast.LENGTH_SHORT).show()
+                                }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@MainActivity, "Erro ao buscar dispositivo: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+
         dialogBuilder.show()
         dialogBuilder.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    }
+
+    // Função para agendar a ação
+    private fun scheduleAction(hora: Int, minuto: Int, dispositivo: String, acao: String, tipoDisp : String, aux:String) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            putExtra("dispositivo", dispositivo)
+            putExtra("acao", acao)
+            putExtra("tipoDisp", tipoDisp)
+            putExtra("aux", aux)
+        }
+
+        // Definindo o tempo para o alarme
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hora)
+            set(Calendar.MINUTE, minuto)
+            set(Calendar.SECOND, 0)
+            // Se a hora já passou, agendar para o próximo dia
+            if (timeInMillis < System.currentTimeMillis()) {
+                add(Calendar.DAY_OF_YEAR, 1)
+            }
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
 
 
@@ -265,7 +362,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val intentLog = Intent(this, SignInActivity::class.java)
-        startActivity(intentLog)
         when(item.itemId){
             R.id.nav_home -> replaceFragment(HomeFragment())
             R.id.nav_conectar -> openNetworkConnections()

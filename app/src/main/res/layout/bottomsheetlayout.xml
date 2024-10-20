@@ -75,42 +75,18 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/baseline_lightbulb_circle_24"></ImageView>
+            android:src="@drawable/baseline_settings_24"></ImageView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
-            android:text="Criar Controle Lampada"
+            android:text="Criar Controle "
             android:textColor="@color/black"
             android:textSize="20sp" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/layoutLive"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="30dp">
 
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_wind_power_24"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:text="Cria Controle Ventilador"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-    </LinearLayout>
 
 </LinearLayout>

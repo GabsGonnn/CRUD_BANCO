@@ -13,22 +13,7 @@
         android:hint="Nome do Dispositivo"
         android:inputType="textPersonName" />
 
-    <EditText
-        android:id="@+id/etDispTipo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:hint="Tipo do Dispositivo" />
 
-    <EditText
-        android:id="@+id/etDispStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:hint="Status do Dispositivo"
-        android:inputType="textPersonName" />
 
     <EditText
         android:id="@+id/etDispLocal"
@@ -48,14 +33,6 @@
         android:hint="Data Instalação do Dispositivo"
         android:inputType="textPersonName" />
 
-    <EditText
-        android:id="@+id/etDispDtAtt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:hint="Data Atualização do Dispositivo"
-        android:inputType="textPersonName" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnUpdateData"

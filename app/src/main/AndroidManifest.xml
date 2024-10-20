@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
 
     <application
         android:allowBackup="true"
@@ -17,6 +20,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CRUD_BANCO"
         tools:targetApi="31">
+        <activity
+            android:name=".activities.ControlesDetailsActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.SensorDetailsActivity"
             android:exported="false" />
@@ -51,6 +57,9 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
+        <receiver android:name=".activities.AlarmReceiver" />
+
     </application>
 
 </manifest>

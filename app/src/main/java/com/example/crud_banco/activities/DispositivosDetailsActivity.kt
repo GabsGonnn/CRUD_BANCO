@@ -26,13 +26,10 @@ import java.time.format.DateTimeFormatter
 
 class DispositivosDetailsActivity : AppCompatActivity() {
 
-    private lateinit var tvDispId: TextView
     private lateinit var tvDispName: TextView
     private lateinit var tvDispTipo: TextView
-    private lateinit var tvDispStatus: TextView
     private lateinit var tvDispLocal: TextView
     private lateinit var tvDispDtInst: TextView
-    private lateinit var tvDispDtAtt: TextView
     private lateinit var btnUpdate: Button
     private lateinit var btnDelete: Button
     private lateinit var controlSwitch: SwitchCompat
@@ -41,6 +38,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
     private lateinit var dispTipo: String
     private lateinit var dispId: String
     private lateinit var dispAux: String
+    private lateinit var dispStatus: String
 
     private lateinit var dbRef2: DatabaseReference
 
@@ -49,6 +47,12 @@ class DispositivosDetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dispositivos_details)
+
+        dispTipo = intent.getStringExtra("dispTipo").toString()
+        dispId = intent.getStringExtra("dispId").toString()
+        dispAux = intent.getStringExtra("dispAux").toString()
+        dispStatus = intent.getStringExtra("dispStatus").toString()
+
         initView()
         setValuesToViews()
 
@@ -57,10 +61,6 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         val password = "Admin1234!"
 
         mqttManager = MqttManager(host, username, password)
-
-        dispTipo = intent.getStringExtra("dispTipo").toString()
-        dispId = intent.getStringExtra("dispId").toString()
-        dispAux = intent.getStringExtra("dispAux").toString()
 
         mqttManager.connect(
             onConnected = {
@@ -106,7 +106,6 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
 
     private fun setupSwitch() {
-        controlSwitch = findViewById(R.id.controlSwitch)
 
         controlSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
             val message = if (isChecked) {
@@ -129,8 +128,6 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
             dbRef2.child(dispId).setValue(loggg)
                 .addOnCompleteListener{
-                    Toast.makeText(this,"Dado inserido com sucesso",Toast.LENGTH_SHORT).show()
-
                 }.addOnFailureListener{ err->
                     Toast.makeText(this,"Erro ${err.message}",Toast.LENGTH_SHORT).show()
                 }
@@ -153,26 +150,21 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
 
     private fun initView() {
-        tvDispId = findViewById(R.id.tvDispId)
+        controlSwitch = findViewById(R.id.controlSwitch)
         tvDispName = findViewById(R.id.tvDispName)
-        tvDispStatus = findViewById(R.id.tvDispStatus)
         tvDispTipo = findViewById(R.id.tvDispTipo)
         tvDispLocal = findViewById(R.id.tvDispLocal)
         tvDispDtInst = findViewById(R.id.tvDispDtInst)
-        tvDispDtAtt = findViewById(R.id.tvDispDtAtt)
-
         btnUpdate = findViewById(R.id.btnUpdate)
         btnDelete = findViewById(R.id.btnDelete)
     }
 
     private fun setValuesToViews() {
-        tvDispId.text = intent.getStringExtra("dispId")
         tvDispName.text = intent.getStringExtra("dispNome")
         tvDispTipo.text = intent.getStringExtra("dispTipo")
-        tvDispStatus.text = intent.getStringExtra("dispStatus")
         tvDispLocal.text = intent.getStringExtra("dispLocal")
         tvDispDtInst.text = intent.getStringExtra("dispDtInst")
-        tvDispDtAtt.text = intent.getStringExtra("dispDtAtt")
+        controlSwitch.isChecked = dispStatus == "ligar"
     }
 
     private fun openUpdateDialog(dispId: String, dispNome: String) {
@@ -182,20 +174,14 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
         mDialog.setView(mDialogView)
         val etDispNome = mDialogView.findViewById<EditText>(R.id.etDispNome)
-        val etDispTipo = mDialogView.findViewById<EditText>(R.id.etDispTipo)
-        val etDispStatus = mDialogView.findViewById<EditText>(R.id.etDispStatus)
         val etDispLocal = mDialogView.findViewById<EditText>(R.id.etDispLocal)
         val etDispDtInst = mDialogView.findViewById<EditText>(R.id.etDispDtInst)
-        val etDispDtAtt = mDialogView.findViewById<EditText>(R.id.etDispDtAtt)
 
         val btnUpdateData = mDialogView.findViewById<Button>(R.id.btnUpdateData)
 
         etDispNome.setText(tvDispName.text.toString())
-        etDispTipo.setText(tvDispTipo.text.toString())
-        etDispStatus.setText(tvDispStatus.text.toString())
         etDispLocal.setText(tvDispLocal.text.toString())
         etDispDtInst.setText(tvDispDtInst.text.toString())
-        etDispDtAtt.setText(tvDispDtAtt.text.toString())
 
         mDialog.setTitle("Atualizando registro de $dispNome")
 
@@ -206,30 +192,27 @@ class DispositivosDetailsActivity : AppCompatActivity() {
             updateDispData(
                 dispId,
                 etDispNome.text.toString(),
-                etDispTipo.text.toString(),
-                etDispStatus.text.toString(),
+                dispTipo,
+                dispStatus,
                 etDispLocal.text.toString(),
                 etDispDtInst.text.toString(),
-                etDispDtAtt.text.toString(),
+                etDispDtInst.text.toString(),
+                dispAux
             )
 
             Toast.makeText(applicationContext, "Dados do dispositivo atualizados", Toast.LENGTH_LONG).show()
 
             // Atualiza os dados nos TextViews
             tvDispName.text = etDispNome.text.toString()
-            tvDispTipo.text = etDispTipo.text.toString()
-            tvDispStatus.text = etDispStatus.text.toString()
             tvDispLocal.text = etDispLocal.text.toString()
             tvDispDtInst.text = etDispDtInst.text.toString()
-            tvDispDtAtt.text = etDispDtAtt.text.toString()
-
             alertDialog.dismiss()
         }
     }
 
-    private fun updateDispData(id: String, nome: String, tipo: String, status: String, local: String, dtInst: String, dtAtt: String) {
+    private fun updateDispData(id: String, nome: String, tipo: String, status: String, local: String, dtInst: String, dtAtt: String, aux: String) {
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp").child(id)
-        val dispInfo = DispositivosModelo(id, nome, tipo, status, local, dtInst, dtAtt)
+        val dispInfo = DispositivosModelo(id, nome, tipo, status, local, dtInst, dtAtt, aux)
         dbRef.setValue(dispInfo)
     }
 
@@ -239,7 +222,6 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         // Atualiza apenas o campo de status
         dbRef.child("dispStatus").setValue(newStatus)
             .addOnSuccessListener {
-                tvDispStatus.text = newStatus
                 Log.d("UpdateStatus", "Status atualizado com sucesso para: $newStatus")
             }
             .addOnFailureListener { error ->
