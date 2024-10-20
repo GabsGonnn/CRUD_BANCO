@@ -14,14 +14,6 @@
         android:inputType="textPersonName" />
 
     <EditText
-        android:id="@+id/etsenValor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:hint="Valor" />
-
-    <EditText
         android:id="@+id/etsenUnidade"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

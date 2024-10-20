@@ -264,10 +264,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        val intentLog = Intent(this, SignInActivity::class.java)
+        startActivity(intentLog)
         when(item.itemId){
             R.id.nav_home -> replaceFragment(HomeFragment())
             R.id.nav_conectar -> openNetworkConnections()
-            R.id.nav_logout -> Toast.makeText(this, "Logout!", Toast.LENGTH_SHORT).show()
+            R.id.nav_logout -> startActivity(intentLog)
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true

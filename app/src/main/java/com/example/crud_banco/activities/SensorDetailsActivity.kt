@@ -79,7 +79,6 @@ class SensorDetailsActivity : AppCompatActivity() {
     private fun setupMqttSubscription(topic: String) {
         mqttManager.subscribe(topic,
             onSubscribed = {
-                // Aqui você pode implementar a lógica para lidar com mensagens recebidas
                 mqttManager.setMessageCallback { message ->
                     handleSensorUpdate(message)
                 }
@@ -89,18 +88,17 @@ class SensorDetailsActivity : AppCompatActivity() {
     }
 
     private fun handleSensorUpdate(message: String) {
-        // Atualiza a UI com o novo valor recebido
         val valor : String = message.toString()
+        val valorformatado: String? = valor?.let { String.format("%.1f", it.toDouble()) }
         var text: String? = null
         if (tipoSensor == "termometro"){
-            text  = (valor +" ºC")
+            text  = (valorformatado +" ºC")
         }else{
-            text = (valor +"%")
+            text = (valorformatado +"%")
         }
 
         tvacao.text = text
 
-        // Atualiza o valor no Firebase
         updateSensorData(dispId, tvnome.text.toString(), tipoSensor, message)
     }
 
@@ -114,23 +112,21 @@ class SensorDetailsActivity : AppCompatActivity() {
 
     private fun setValuesToViews() {
         tvnome.text = intent.getStringExtra("nome")
-        tvacao.text = intent.getStringExtra("valor")
-        tvdata.text = intent.getStringExtra("unidade")
+        tvacao.text = intent.getStringExtra("valorinicial")
+        tvdata.text = intent.getStringExtra("timestamp")
     }
 
     private fun openUpdateDialog(dispId: String, dispNome: String) {
         val mDialog = AlertDialog.Builder(this)
         val inflater = layoutInflater
         val mDialogView = inflater.inflate(R.layout.updatesen_dialog, null)
+        val valorsen = intent.getStringExtra("valor").toString()
 
         mDialog.setView(mDialogView)
         val etsenNome = mDialogView.findViewById<EditText>(R.id.etsenNome)
-        val etsenValor = mDialogView.findViewById<EditText>(R.id.etsenValor)
         val etsenUnidade = mDialogView.findViewById<EditText>(R.id.etsenUnidade)
 
-        // Definindo os valores atuais
         etsenNome.setText(tvnome.text)
-        etsenValor.setText(tvacao.text)
         etsenUnidade.setText(tvdata.text)
 
         val btnUpdateDataSen = mDialogView.findViewById<Button>(R.id.btnUpdateDataSen)
@@ -144,15 +140,13 @@ class SensorDetailsActivity : AppCompatActivity() {
             updateSensorData(
                 dispId,
                 etsenNome.text.toString(),
-                tipoSensor, // Certifique-se de que o tipoSensor não está sendo alterado
-                etsenValor.text.toString()
+                tipoSensor,
+                valorsen
             )
 
             Toast.makeText(applicationContext, "Dados do sensor atualizados", Toast.LENGTH_LONG).show()
 
-            // Atualiza os textos na Activity
             tvnome.text = etsenNome.text.toString()
-            tvacao.text = etsenValor.text.toString()
             tvdata.text = etsenUnidade.text.toString()
 
             alertDialog.dismiss()

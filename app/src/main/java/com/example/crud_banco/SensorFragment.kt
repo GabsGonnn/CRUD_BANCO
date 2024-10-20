@@ -79,8 +79,18 @@ class SensorFragment : Fragment() {
         sensorAdapter.setOnItemClickListener(object : SensorAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
                 val intent = Intent(requireContext(), SensorDetailsActivity::class.java)
+                val valorpuro: String? = sensorList[position].valor
+                val valorinicial: String? = valorpuro?.let { String.format("%.1f", it.toDouble()) }
+                val verificarsensor: String? = sensorList[position].tipoSensor
+                val textinicial: String?
+                if (verificarsensor == "termometro"){
+                    textinicial  = (valorinicial +" ºC")
+                }else{
+                    textinicial = (valorinicial +"%")
+                }
                 intent.putExtra("dispId", sensorList[position].dispId)
                 intent.putExtra("nome", sensorList[position].nome)
+                intent.putExtra("valorinicial", textinicial)
                 intent.putExtra("valor", sensorList[position].valor)
                 intent.putExtra("tipoSensor",sensorList[position].tipoSensor)
                 intent.putExtra("aux",sensorList[position].aux)
