@@ -313,6 +313,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val local = editTextLocation.text.toString()
             val date = textViewDate.text.toString()
 
+            if (nome.isEmpty() || local.isEmpty() || date == "Data de Instalação") {
+                Toast.makeText(this@MainActivity, "Por favor, preencha todos os campos.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (tipo == "lampada" || tipo == "ventilador") {
                 val dbRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Exemplo_Disp")
 

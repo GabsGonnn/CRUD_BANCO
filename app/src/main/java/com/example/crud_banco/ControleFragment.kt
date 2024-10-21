@@ -29,10 +29,9 @@ class ControleFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_controle, container, false)
 
-        // Inicializa a lista de sensores
+
         controleList = mutableListOf()
 
         // Inicializa o RecyclerView
@@ -58,14 +57,14 @@ class ControleFragment : Fragment() {
                     for (sensorSnap in snapshot.children) {
                         val sensorData = sensorSnap.getValue(Controle::class.java)
                         sensorData?.let {
-                            // Define a imagem com base no tipo do sensor
+
                             val iconResId = when (it.tipoDisp) {
                                 "lampada" -> R.drawable.lamp_icon
                                 "ventilador" -> R.drawable.vent_icon
-                                else -> R.drawable.temp_icon // Imagem padrão, se necessário
+                                else -> R.drawable.temp_icon
                             }
                             it.imagem = iconResId
-                            controleList.add(it) // Adiciona o sensor com a imagem correta
+                            controleList.add(it)
                         }
                     }
                     controleAdapter.notifyDataSetChanged()
@@ -73,11 +72,11 @@ class ControleFragment : Fragment() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Tratar erro se necessário
+
             }
         })
 
-        // Configurar o listener para cliques nos itens
+
         controleAdapter.setOnItemClickListener(object : ControleAdapter.onItemClickListener {
             override fun onItemClick(position: Int) {
                 val intent = Intent(requireContext(), ControlesDetailsActivity::class.java)

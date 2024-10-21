@@ -29,7 +29,6 @@ class AlarmReceiver : BroadcastReceiver() {
         val aux = intent.getStringExtra("aux")
         val requestCode = intent.getIntExtra("requestCode", -1)
 
-        // Configurações do MQTT
         val host = "5c4f71f03f934cd08ccae931b3d4a457.s1.eu.hivemq.cloud"
         val username = "admin"
         val password = "Admin1234!"
