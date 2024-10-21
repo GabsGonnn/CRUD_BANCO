@@ -6,28 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".activities.DispositivosDetailsActivity">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnUpdateContr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Atualizar"
-        android:background="@drawable/button_background"
-        app:layout_constraintEnd_toStartOf="@+id/btnDeleteContr"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/linearLayout" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnDeleteContr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="Deletar"
         android:background="@drawable/button_background"
+        android:text="Deletar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnUpdateContr"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/linearLayout" />
 
     <LinearLayout

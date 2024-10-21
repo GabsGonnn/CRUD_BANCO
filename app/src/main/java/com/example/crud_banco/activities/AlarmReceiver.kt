@@ -20,14 +20,16 @@ import java.time.format.DateTimeFormatter
 class AlarmReceiver : BroadcastReceiver() {
     private lateinit var mqttManager: MqttManager
     private lateinit var topic: String
+    private lateinit var acao: String
 
     override fun onReceive(context: Context, intent: Intent) {
-
         val dispositivo = intent.getStringExtra("dispositivo")
-        val acao = intent.getStringExtra("acao")
+        acao = intent.getStringExtra("acao").toString()
         val tipoDisp = intent.getStringExtra("tipoDisp")
         val aux = intent.getStringExtra("aux")
+        val requestCode = intent.getIntExtra("requestCode", -1)
 
+        // Configurações do MQTT
         val host = "5c4f71f03f934cd08ccae931b3d4a457.s1.eu.hivemq.cloud"
         val username = "admin"
         val password = "Admin1234!"
@@ -46,36 +48,35 @@ class AlarmReceiver : BroadcastReceiver() {
                     onSubscribed = {
                         mqttManager.publish(topic, acao.toString(),
                             onSuccess = {
-                                Log.d("MainActivity", "Mensagem '$acao' enviada com sucesso")
+                                Log.d("AlarmReceiver", "Mensagem '$acao' enviada com sucesso")
                                 // Após enviar a mensagem, remover a ação e atualizar o status
-                                removeActionAndUpdateStatus(dispositivo, acao, tipoDisp, aux, context)
+                                removeActionByRequestCode(dispositivo, requestCode, context)
                             },
-                            onError = { Log.e("MainActivity", "Falha ao enviar mensagem '$acao'", it) }
+                            onError = { Log.e("AlarmReceiver", "Falha ao enviar mensagem '$acao'", it) }
                         )
                     },
-                    onError = { Log.d("MainActivity", "Erro ao se inscrever no tópico") }
+                    onError = { Log.d("AlarmReceiver", "Erro ao se inscrever no tópico") }
                 )
             },
-            onError = { Log.d("MainActivity", "Erro na conexão") }
+            onError = { Log.d("AlarmReceiver", "Erro na conexão") }
         )
 
         Toast.makeText(context, "Ação: $acao no dispositivo: $dispositivo", Toast.LENGTH_SHORT).show()
 
+        // Log de atividade
         val dbRef2 = FirebaseDatabase.getInstance().getReference("logs_atividade")
-
         val logtimestamp = getCurrentDateOnly()
         val logtimestamphora = getCurrentDateOnlyhora()
+        val dispId = dbRef2.push().key ?: ""
 
-        val dispId = dbRef2.push().key?: ""
-
-        val loggg = LogModelo(dispId,dispositivo, acao, logtimestamp, logtimestamphora)
+        val loggg = LogModelo(dispId, dispositivo, acao, logtimestamp, logtimestamphora)
 
         dbRef2.child(dispId).setValue(loggg)
-            .addOnCompleteListener{
-            }.addOnFailureListener{ err->
+            .addOnCompleteListener {
+                Log.d("AlarmReceiver", "Log de atividade salvo com sucesso")
+            }.addOnFailureListener { err ->
+                Log.e("AlarmReceiver", "Erro ao salvar log: ${err.message}")
             }
-
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -84,6 +85,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         return currentDate.format(formatter)
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getCurrentDateOnlyhora(): String {
         val currentTimehora = LocalTime.now()
@@ -91,19 +93,20 @@ class AlarmReceiver : BroadcastReceiver() {
         return currentTimehora.format(formatterhora)
     }
 
-    private fun removeActionAndUpdateStatus(dispositivo: String?, acao: String?, tipoDisp: String?, aux: String?, context: Context) {
-        // Referência ao banco de dados
+    private fun removeActionByRequestCode(dispositivo: String?, requestCode: Int, context: Context) {
         val dbRefFunc = FirebaseDatabase.getInstance().getReference("Funci_Luz")
-        val dbRefDisp = FirebaseDatabase.getInstance().getReference("Exemplo_Disp")
 
-        // Remover a ação do banco "Funci_Luz"
+        // Remover a ação específica do banco "Funci_Luz" usando o requestCode
         dbRefFunc.orderByChild("nomeDisp").equalTo(dispositivo).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (actionSnap in snapshot.children) {
-                    actionSnap.ref.removeValue().addOnCompleteListener {
-                        Log.d("AlarmReceiver", "Ação removida com sucesso")
-                    }.addOnFailureListener { err ->
-                        Log.e("AlarmReceiver", "Erro ao remover a ação: ${err.message}")
+                    val actionRequestCode = actionSnap.child("requestCode").getValue(Int::class.java) // Supondo que você tenha um campo "requestCode"
+                    if (actionRequestCode == requestCode) {
+                        actionSnap.ref.removeValue().addOnCompleteListener {
+                            Log.d("AlarmReceiver", "Ação removida com sucesso: $requestCode")
+                        }.addOnFailureListener { err ->
+                            Log.e("AlarmReceiver", "Erro ao remover a ação: ${err.message}")
+                        }
                     }
                 }
             }
@@ -114,8 +117,8 @@ class AlarmReceiver : BroadcastReceiver() {
         })
 
         // Atualizar o status do dispositivo no banco "Exemplo_Disp"
-        dbRefDisp.orderByChild("dispNome").equalTo(dispositivo).addListenerForSingleValueEvent(object :
-            ValueEventListener {
+        val dbRefDisp = FirebaseDatabase.getInstance().getReference("Exemplo_Disp")
+        dbRefDisp.orderByChild("dispNome").equalTo(dispositivo).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     for (deviceSnap in snapshot.children) {
@@ -124,14 +127,14 @@ class AlarmReceiver : BroadcastReceiver() {
                                 Log.d("AlarmReceiver", "Status do dispositivo atualizado para: $acao")
                             }
                             .addOnFailureListener { err ->
-                                Log.e("AlarmReceiver", "Erro ao atualizar status do dispositivo: ${err.message}")
+                                Log.e("AlarmReceiver", "Erro ao atualizar status: ${err.message}")
                             }
                     }
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e("AlarmReceiver", "Erro ao buscar dispositivo: ${error.message}")
+                Log.e("AlarmReceiver", "Erro ao buscar dispositivos: ${error.message}")
             }
         })
     }

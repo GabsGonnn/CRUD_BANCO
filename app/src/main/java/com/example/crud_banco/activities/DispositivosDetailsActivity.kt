@@ -42,7 +42,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
 
     private lateinit var dbRef2: DatabaseReference
 
-    private lateinit var topic: String // Adicione uma variável para armazenar o tópico
+    private lateinit var topic: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -219,7 +219,7 @@ class DispositivosDetailsActivity : AppCompatActivity() {
     private fun updateDispStatus(id: String, newStatus: String) {
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp").child(id)
 
-        // Atualiza apenas o campo de status
+
         dbRef.child("dispStatus").setValue(newStatus)
             .addOnSuccessListener {
                 Log.d("UpdateStatus", "Status atualizado com sucesso para: $newStatus")
@@ -233,15 +233,37 @@ class DispositivosDetailsActivity : AppCompatActivity() {
         val dbRef = FirebaseDatabase.getInstance().getReference("Exemplo_Disp").child(id)
         val mTask = dbRef.removeValue()
 
-        mTask.addOnSuccessListener {
-            Toast.makeText(this, "Dados do dispositivo deletados", Toast.LENGTH_LONG).show()
 
-            val intent = Intent(this, MainActivity::class.java)
-            finish()
-            startActivity(intent)
-        }.addOnFailureListener { error ->
-            Toast.makeText(this, "Erro ao deletar: ${error.message}", Toast.LENGTH_LONG).show()
+        val dispNome = intent.getStringExtra("dispNome").toString()
+        checkForActions(dispNome) { hasActions ->
+            if (hasActions) {
+                Toast.makeText(this, "Não é possível deletar, ação cadastrada com o mesmo nome.", Toast.LENGTH_LONG).show()
+            } else {
+                mTask.addOnSuccessListener {
+                    Toast.makeText(this, "Dados do dispositivo deletados", Toast.LENGTH_LONG).show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    finish()
+                    startActivity(intent)
+                }.addOnFailureListener { error ->
+                    Toast.makeText(this, "Erro ao deletar: ${error.message}", Toast.LENGTH_LONG).show()
+                }
+            }
         }
+    }
+
+    private fun checkForActions(dispNome: String, callback: (Boolean) -> Unit) {
+        val actionsRef = FirebaseDatabase.getInstance().getReference("Funci_Luz")
+
+        actionsRef.orderByChild("nomeDisp").equalTo(dispNome).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                callback(snapshot.exists())
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("CheckActions", "Erro ao verificar ações", error.toException())
+                callback(false)
+            }
+        })
     }
 
     override fun onDestroy() {

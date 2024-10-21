@@ -7,5 +7,6 @@ data class Controle(
     var valor: String? = null,
     var tipoDisp: String? = null,
     var aux: String? = null,
+    val requestCode: Int? = null,
     var imagem: Int? = null
 )

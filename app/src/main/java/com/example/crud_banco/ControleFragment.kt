@@ -87,6 +87,7 @@ class ControleFragment : Fragment() {
                 intent.putExtra("acao", controleList[position].acao)
                 intent.putExtra("tipoDisp",controleList[position].tipoDisp)
                 intent.putExtra("aux",controleList[position].aux)
+                intent.putExtra("requestCode",controleList[position].requestCode)
                 startActivity(intent)
             }
         })

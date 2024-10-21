@@ -202,22 +202,37 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             val tipoDisp = it.dispTipo // Supondo que você tenha um campo dispTipo
                             val aux = it.dispAux // Supondo que você tenha um campo aux
 
-                            // Adicionar ao banco "Funci_Luz"
+                            // Buscar o maior requestCode existente
                             val dbRefFunc = FirebaseDatabase.getInstance().getReference("Funci_Luz")
-                            val controleId = dbRefFunc.push().key ?: ""
+                            dbRefFunc.orderByChild("requestCode").limitToLast(1).addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    val requestCode = if (snapshot.exists()) {
+                                        val lastControle = snapshot.children.first().getValue(Controle::class.java)
+                                        (lastControle?.requestCode ?: 0) + 1 // Incrementa o maior requestCode encontrado
+                                    } else {
+                                        1 // Se não houver nenhum controle, começa com 1
+                                    }
 
-                            val controleLuz = Controle(controleId, nomeSelecionado, acaoSelecionada, horaFormatada, tipoDisp, aux)
+                                    // Adicionar ao banco "Funci_Luz"
+                                    val controleId = dbRefFunc.push().key ?: ""
+                                    val controleLuz = Controle(controleId, nomeSelecionado, acaoSelecionada, horaFormatada, tipoDisp, aux, requestCode)
 
-                            dbRefFunc.child(controleId).setValue(controleLuz)
-                                .addOnCompleteListener {
-                                    Toast.makeText(this@MainActivity, "Controle de Luz adicionado com sucesso", Toast.LENGTH_SHORT).show()
-                                    dialogBuilder.dismiss()
+                                    dbRefFunc.child(controleId).setValue(controleLuz)
+                                        .addOnCompleteListener {
+                                            Toast.makeText(this@MainActivity, "Controle de Luz adicionado com sucesso", Toast.LENGTH_SHORT).show()
+                                            dialogBuilder.dismiss()
 
-                                    // Agendar a ação
-                                    scheduleAction(hora, minuto, nomeSelecionado, acaoSelecionada, tipoDisp.toString(), aux.toString(), )
-                                }.addOnFailureListener { err ->
-                                    Toast.makeText(this@MainActivity, "Erro: ${err.message}", Toast.LENGTH_SHORT).show()
+                                            // Agendar a ação
+                                            scheduleAction(hora, minuto, nomeSelecionado, acaoSelecionada, tipoDisp.toString(), aux.toString(), requestCode)
+                                        }.addOnFailureListener { err ->
+                                            Toast.makeText(this@MainActivity, "Erro: ${err.message}", Toast.LENGTH_SHORT).show()
+                                        }
                                 }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    Toast.makeText(this@MainActivity, "Erro ao buscar requestCode: ${error.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            })
                         }
                     }
                 }
@@ -233,13 +248,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     // Função para agendar a ação
-    private fun scheduleAction(hora: Int, minuto: Int, dispositivo: String, acao: String, tipoDisp : String, aux:String) {
+    private fun scheduleAction(hora: Int, minuto: Int, dispositivo: String, acao: String, tipoDisp: String, aux: String, requestCode: Int) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java).apply {
             putExtra("dispositivo", dispositivo)
             putExtra("acao", acao)
             putExtra("tipoDisp", tipoDisp)
             putExtra("aux", aux)
+            putExtra("requestCode", requestCode)
         }
 
         // Definindo o tempo para o alarme
@@ -253,7 +269,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
 
